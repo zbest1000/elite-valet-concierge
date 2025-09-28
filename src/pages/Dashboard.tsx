@@ -95,10 +95,10 @@ const Dashboard = () => {
                 <div className="w-8 h-8 bg-gradient-gold rounded-full flex items-center justify-center">
                   <span className="text-luxury-navy font-bold text-sm">EV</span>
                 </div>
-                <span className="text-xl font-bold text-luxury-navy">EliteValet Dashboard</span>
+                <span className="text-xl font-bold text-luxury-navy">EliteValet Scheduling</span>
               </div>
             </div>
-            <Button variant="gold" size="sm">Schedule New Pickup</Button>
+            <Button variant="gold" size="sm">Contact Us</Button>
           </div>
         </div>
       </header>
@@ -108,7 +108,7 @@ const Dashboard = () => {
           {/* Sidebar - Calendar & Quick Stats */}
           <div className="space-y-6">
             <Card className="p-6">
-              <h3 className="text-lg font-semibold text-luxury-navy mb-4">Schedule Calendar</h3>
+              <h3 className="text-lg font-semibold text-luxury-navy mb-4">Pickup Calendar</h3>
               <Calendar
                 mode="single"
                 selected={selectedDate}
@@ -238,9 +238,9 @@ const Dashboard = () => {
             <Card className="p-6 border-dashed border-2 border-luxury-gold/30 bg-luxury-gold/5">
               <div className="text-center">
                 <Package className="w-12 h-12 text-luxury-gold mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-luxury-navy mb-2">Schedule New Pickup</h3>
-                <p className="text-muted-foreground mb-4">Add a new pickup schedule for your property</p>
-                <Button variant="gold">Add Schedule</Button>
+                <h3 className="text-lg font-semibold text-luxury-navy mb-2">Contact for New Schedule</h3>
+                <p className="text-muted-foreground mb-4">Need to add or modify your pickup schedule? Get in touch with us</p>
+                <Button variant="gold">Contact EliteValet</Button>
               </div>
             </Card>
           </div>

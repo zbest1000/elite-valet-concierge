@@ -17,8 +17,8 @@ const steps = [
   {
     number: "03",
     icon: CheckCircle,
-    title: "Experience Excellence",
-    description: "Sit back and enjoy white-glove service. Real-time notifications keep you informed every step of the way."
+    title: "Experience Professional Service",
+    description: "Sit back and enjoy reliable service. Simple notifications keep you informed when pickups are complete."
   }
 ]
 

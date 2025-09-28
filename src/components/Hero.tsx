@@ -33,7 +33,7 @@ const Hero = () => {
             <div className="space-y-3 animate-fade-in" style={{ animationDelay: '0.7s' }}>
               <div className="flex items-center space-x-3 hover:translate-x-2 transition-transform duration-300">
                 <CheckCircle className="w-5 h-5 text-luxury-gold" />
-                <span className="text-foreground">24/7 Customer Support</span>
+                <span className="text-foreground">Responsive Customer Support</span>
               </div>
               <div className="flex items-center space-x-3 hover:translate-x-2 transition-transform duration-300">
                 <CheckCircle className="w-5 h-5 text-luxury-gold" />

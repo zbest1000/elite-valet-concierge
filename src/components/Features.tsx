@@ -15,9 +15,9 @@ const features = [
   },
   {
     icon: Smartphone,
-    title: "Property Dashboard",
-    description: "Online schedule management",
-    detail: "View pickup schedules, track service status, and manage your property's waste collection through our web platform."
+    title: "Simple Scheduling",
+    description: "Basic online tracking",
+    detail: "View your pickup schedules and service updates through our straightforward web dashboard."
   },
   {
     icon: Recycle,

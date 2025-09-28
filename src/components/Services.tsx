@@ -13,8 +13,8 @@ const services = [
   },
   {
     icon: Bell,
-    title: "Responsive Support",
-    description: "24/7 customer care to address any concerns or schedule changes instantly. We're always here for you."
+    title: "Reliable Communication",
+    description: "Customer support to address any concerns or schedule changes. We're here when you need us."
   },
   {
     icon: Sparkles,
