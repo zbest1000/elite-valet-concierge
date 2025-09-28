@@ -16,8 +16,8 @@ const features = [
   {
     icon: Smartphone,
     title: "Digital Convenience",
-    description: "Mobile app control",
-    detail: "Easy scheduling, real-time tracking, and instant support through our premium mobile experience."
+    description: "Online platform control",
+    detail: "Easy scheduling, real-time tracking, and instant support through our premium digital platform."
   },
   {
     icon: Recycle,

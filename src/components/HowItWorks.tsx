@@ -5,8 +5,8 @@ const steps = [
   {
     number: "01",
     icon: Download,
-    title: "Download & Sign Up",
-    description: "Get our mobile app and create your account in under 2 minutes. Choose your service preferences and building details."
+    title: "Contact & Sign Up",
+    description: "Reach out through our website or phone to create your account. We'll gather your property details and service preferences."
   },
   {
     number: "02", 
