@@ -468,7 +468,7 @@ const ImprovedDashboard = () => {
                             : 'No pickup schedules assigned to you.'}
                         </p>
                         {userProfile?.role === 'admin' && (
-                          <Button variant="gold">
+                          <Button variant="gold" onClick={() => setShowScheduleForm(true)}>
                             <Plus className="w-4 h-4 mr-2" />
                             Create First Schedule
                           </Button>
