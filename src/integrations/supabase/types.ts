@@ -65,6 +65,53 @@ export type Database = {
           },
         ]
       }
+      assignment_logs: {
+        Row: {
+          action: string
+          assignment_id: string | null
+          created_at: string
+          id: string
+          location_data: Json | null
+          notes: string | null
+          photos: string[] | null
+          status: string
+          timestamp: string
+          valet_id: string
+        }
+        Insert: {
+          action: string
+          assignment_id?: string | null
+          created_at?: string
+          id?: string
+          location_data?: Json | null
+          notes?: string | null
+          photos?: string[] | null
+          status: string
+          timestamp?: string
+          valet_id: string
+        }
+        Update: {
+          action?: string
+          assignment_id?: string | null
+          created_at?: string
+          id?: string
+          location_data?: Json | null
+          notes?: string | null
+          photos?: string[] | null
+          status?: string
+          timestamp?: string
+          valet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assignment_logs_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "assignments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       assignments: {
         Row: {
           apartment_ids: string[] | null
@@ -132,6 +179,45 @@ export type Database = {
           },
         ]
       }
+      building_templates: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          floors_count: number
+          id: string
+          is_public: boolean
+          name: string
+          naming_pattern: string
+          units_per_floor: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          floors_count?: number
+          id?: string
+          is_public?: boolean
+          name: string
+          naming_pattern?: string
+          units_per_floor?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          floors_count?: number
+          id?: string
+          is_public?: boolean
+          name?: string
+          naming_pattern?: string
+          units_per_floor?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       complexes: {
         Row: {
           address: string | null
@@ -174,9 +260,11 @@ export type Database = {
         Row: {
           apartment_id: string | null
           building: string | null
+          completed_at: string | null
           complex_id: string | null
           created_at: string
           created_by: string
+          customer_rating: number | null
           end_date: string | null
           floor_number: number | null
           id: string
@@ -191,17 +279,21 @@ export type Database = {
           scheduled_date: string
           scheduled_time: string
           start_date: string | null
+          started_at: string | null
           status: string
           target_type: string | null
           updated_at: string
           valet_id: string | null
+          valet_notes: string | null
         }
         Insert: {
           apartment_id?: string | null
           building?: string | null
+          completed_at?: string | null
           complex_id?: string | null
           created_at?: string
           created_by: string
+          customer_rating?: number | null
           end_date?: string | null
           floor_number?: number | null
           id?: string
@@ -216,17 +308,21 @@ export type Database = {
           scheduled_date: string
           scheduled_time: string
           start_date?: string | null
+          started_at?: string | null
           status?: string
           target_type?: string | null
           updated_at?: string
           valet_id?: string | null
+          valet_notes?: string | null
         }
         Update: {
           apartment_id?: string | null
           building?: string | null
+          completed_at?: string | null
           complex_id?: string | null
           created_at?: string
           created_by?: string
+          customer_rating?: number | null
           end_date?: string | null
           floor_number?: number | null
           id?: string
@@ -241,10 +337,12 @@ export type Database = {
           scheduled_date?: string
           scheduled_time?: string
           start_date?: string | null
+          started_at?: string | null
           status?: string
           target_type?: string | null
           updated_at?: string
           valet_id?: string | null
+          valet_notes?: string | null
         }
         Relationships: [
           {
@@ -313,11 +411,137 @@ export type Database = {
         }
         Relationships: []
       }
+      property_assignments: {
+        Row: {
+          assignment_type: string
+          building: string | null
+          complex_id: string | null
+          created_at: string
+          created_by: string
+          floor_number: number | null
+          id: string
+          is_active: boolean
+          permissions: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assignment_type?: string
+          building?: string | null
+          complex_id?: string | null
+          created_at?: string
+          created_by: string
+          floor_number?: number | null
+          id?: string
+          is_active?: boolean
+          permissions?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assignment_type?: string
+          building?: string | null
+          complex_id?: string | null
+          created_at?: string
+          created_by?: string
+          floor_number?: number | null
+          id?: string
+          is_active?: boolean
+          permissions?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_assignments_complex_id_fkey"
+            columns: ["complex_id"]
+            isOneToOne: false
+            referencedRelation: "complexes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_reports: {
+        Row: {
+          created_at: string
+          customer_notes: string | null
+          customer_signature: string | null
+          end_time: string | null
+          id: string
+          items_collected: number | null
+          photos_after: string[] | null
+          photos_before: string[] | null
+          pickup_schedule_id: string | null
+          rating: number | null
+          service_type: string
+          start_time: string | null
+          status: string
+          updated_at: string
+          valet_id: string
+          valet_notes: string | null
+        }
+        Insert: {
+          created_at?: string
+          customer_notes?: string | null
+          customer_signature?: string | null
+          end_time?: string | null
+          id?: string
+          items_collected?: number | null
+          photos_after?: string[] | null
+          photos_before?: string[] | null
+          pickup_schedule_id?: string | null
+          rating?: number | null
+          service_type?: string
+          start_time?: string | null
+          status?: string
+          updated_at?: string
+          valet_id: string
+          valet_notes?: string | null
+        }
+        Update: {
+          created_at?: string
+          customer_notes?: string | null
+          customer_signature?: string | null
+          end_time?: string | null
+          id?: string
+          items_collected?: number | null
+          photos_after?: string[] | null
+          photos_before?: string[] | null
+          pickup_schedule_id?: string | null
+          rating?: number | null
+          service_type?: string
+          start_time?: string | null
+          status?: string
+          updated_at?: string
+          valet_id?: string
+          valet_notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_reports_pickup_schedule_id_fkey"
+            columns: ["pickup_schedule_id"]
+            isOneToOne: false
+            referencedRelation: "pickup_schedules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      bulk_create_apartments: {
+        Args: {
+          p_building: string
+          p_complex_id: string
+          p_end_floor: number
+          p_naming_pattern?: string
+          p_start_floor: number
+          p_units_per_floor: number
+        }
+        Returns: number
+      }
       create_dev_test_data: {
         Args: Record<PropertyKey, never>
         Returns: string

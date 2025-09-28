@@ -7,8 +7,11 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit, Building, Home } from 'lucide-react';
+import { Plus, Edit, Building, Home, Users, Zap } from 'lucide-react';
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import BulkPropertyCreator from './BulkPropertyCreator';
+import UserManagement from './UserManagement';
+import ValetWorkflow from './ValetWorkflow';
 
 interface Complex {
   id: string;
@@ -196,9 +199,12 @@ const PropertyManager: React.FC = () => {
       </div>
 
       <Tabs defaultValue="complexes" className="space-y-4">
-        <TabsList>
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="complexes">Complexes</TabsTrigger>
           <TabsTrigger value="apartments">Apartments</TabsTrigger>
+          <TabsTrigger value="bulk-creator">Bulk Creator</TabsTrigger>
+          <TabsTrigger value="users">User Management</TabsTrigger>
+          <TabsTrigger value="valet">Valet Workflow</TabsTrigger>
         </TabsList>
 
         <TabsContent value="complexes" className="space-y-4">
@@ -390,6 +396,21 @@ const PropertyManager: React.FC = () => {
               </Card>
             ))}
           </div>
+        </TabsContent>
+
+        <TabsContent value="bulk-creator" className="space-y-4">
+          <BulkPropertyCreator 
+            complexes={complexes} 
+            onSuccess={fetchData} 
+          />
+        </TabsContent>
+
+        <TabsContent value="users" className="space-y-4">
+          <UserManagement complexes={complexes} />
+        </TabsContent>
+
+        <TabsContent value="valet" className="space-y-4">
+          <ValetWorkflow />
         </TabsContent>
       </Tabs>
     </div>
