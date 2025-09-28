@@ -15,7 +15,7 @@ const Hero = () => {
                 <Star className="w-5 h-5 fill-current animate-pulse" style={{ animationDelay: '0.2s' }} />
                 <Star className="w-5 h-5 fill-current animate-pulse" style={{ animationDelay: '0.3s' }} />
                 <Star className="w-5 h-5 fill-current animate-pulse" style={{ animationDelay: '0.4s' }} />
-                <span className="text-sm font-medium text-luxury-charcoal">Rated Exceptional</span>
+                <span className="text-sm font-medium text-luxury-charcoal">Professional Service</span>
               </div>
               
               <h1 className="text-4xl lg:text-6xl font-bold text-luxury-navy leading-tight animate-scale-in">
@@ -24,9 +24,9 @@ const Hero = () => {
                 Service
               </h1>
               
-              <p className="text-lg text-muted-foreground max-w-md leading-relaxed animate-fade-in" style={{ animationDelay: '0.5s' }}>
-                Experience waste removal as seamless and refined as the luxury lifestyle you deserve. 
-                White-glove service that goes beyond expectations.
+              <p className="text-lg text-muted-foreground max-w-md leading-relaxed animate-fade-in" style={{ animationDelay: "0.5s" }}>
+                Professional waste removal service designed to be seamless and convenient. 
+                Quality service that aims to exceed your expectations.
               </p>
             </div>
 

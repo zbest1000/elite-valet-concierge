@@ -9,7 +9,7 @@ const services = [
   {
     icon: Shield,
     title: "Discreet & Respectful",
-    description: "Quiet, non-intrusive service that blends seamlessly with your luxury lifestyle and building aesthetic."
+    description: "Quiet, non-intrusive service that blends seamlessly with your building's operations and aesthetic."
   },
   {
     icon: Bell,
@@ -18,8 +18,8 @@ const services = [
   },
   {
     icon: Sparkles,
-    title: "White-Glove Handling",
-    description: "Premium bins, odor-free guarantee, and meticulous care that treats your property like our own."
+    title: "Quality Handling",
+    description: "Professional bins, clean service, and careful attention to detail when handling your property."
   },
   {
     icon: Leaf,
@@ -28,8 +28,8 @@ const services = [
   },
   {
     icon: Users,
-    title: "Seamless Integration",
-    description: "Works flawlessly with HOAs, property managers, and building staff for effortless coordination."
+    title: "Property Coordination",
+    description: "We work directly with HOAs, property managers, and building staff to ensure smooth operations."
   }
 ]
 
@@ -39,10 +39,10 @@ const Services = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16 animate-fade-in">
           <h2 className="text-3xl lg:text-5xl font-bold text-luxury-navy mb-4 animate-scale-in">
-            Service Beyond Expectations
+            Professional Service Standards
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            Every detail crafted around your comfort, convenience, and the luxury standards you expect.
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: "0.2s" }}>
+            Every detail focused on your comfort, convenience, and maintaining high service standards.
           </p>
         </div>
 

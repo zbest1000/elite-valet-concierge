@@ -37,9 +37,9 @@ const Contact = () => {
             <h2 className="text-3xl lg:text-5xl font-bold text-luxury-navy mb-4 animate-scale-in">
               Partner with EliteValet
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              Transform your property's waste management with our premium valet service designed for luxury apartment complexes.
-            </p>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: "0.2s" }}>
+            Improve your property's waste management with our professional valet service designed for apartment complexes.
+          </p>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-12">
@@ -154,7 +154,7 @@ const Contact = () => {
                   </div>
                   <div className="flex items-center justify-between hover:translate-x-2 transition-transform duration-300">
                     <span className="font-medium text-luxury-navy">Holiday Coverage</span>
-                    <span className="text-muted-foreground">Maintained schedule</span>
+                    <span className="text-muted-foreground">Limited schedule</span>
                   </div>
                 </div>
                 
@@ -190,7 +190,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <div className="font-semibold text-luxury-navy">Response Time</div>
-                    <div className="text-muted-foreground">24-hour quote turnaround</div>
+                    <div className="text-muted-foreground">Within 2 business days</div>
                   </div>
                 </div>
               </div>
@@ -242,8 +242,8 @@ const Contact = () => {
 
               <div className="pt-6 border-t border-border">
                 <p className="text-sm text-muted-foreground">
-                  Serving metropolitan areas nationwide with plans for rapid expansion. 
-                  Ask about our pilot program for new markets.
+                  Currently serving select metropolitan areas. 
+                  Contact us to check availability in your location.
                 </p>
               </div>
             </div>

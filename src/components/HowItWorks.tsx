@@ -30,8 +30,8 @@ const HowItWorks = () => {
           <h2 className="text-3xl lg:text-5xl font-bold text-luxury-navy mb-4 animate-scale-in">
             How It Works
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            Getting started with EliteValet is as refined as our service. Three simple steps to luxury convenience.
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: "0.2s" }}>
+            Getting started with EliteValet is straightforward. Three simple steps to professional convenience.
           </p>
         </div>
 

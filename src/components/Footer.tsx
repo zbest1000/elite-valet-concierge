@@ -13,8 +13,8 @@ const Footer = () => {
               <span className="text-2xl font-bold">EliteValet</span>
             </div>
             <p className="text-white/80 max-w-md leading-relaxed mb-6">
-              Redefining waste removal with white-glove service that matches your luxury lifestyle. 
-              Experience the difference that true concierge care makes.
+              Professional waste removal service designed to provide reliable, courteous service 
+              that makes a difference for your property.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-luxury-gold hover:text-luxury-navy hover:scale-110 transition-all duration-300">
@@ -38,7 +38,7 @@ const Footer = () => {
               <li><a href="#" className="hover:text-luxury-gold hover:translate-x-1 transition-all duration-300 story-link">Residential Pickup</a></li>
               <li><a href="#" className="hover:text-luxury-gold hover:translate-x-1 transition-all duration-300 story-link">Commercial Service</a></li>
               <li><a href="#" className="hover:text-luxury-gold hover:translate-x-1 transition-all duration-300 story-link">Eco-Friendly Options</a></li>
-              <li><a href="#" className="hover:text-luxury-gold hover:translate-x-1 transition-all duration-300 story-link">24/7 Support</a></li>
+              <li><a href="#" className="hover:text-luxury-gold hover:translate-x-1 transition-all duration-300 story-link">Customer Support</a></li>
             </ul>
           </div>
 
@@ -58,7 +58,7 @@ const Footer = () => {
             © 2024 EliteValet. All rights reserved.
           </p>
           <p className="text-white/60 text-sm mt-4 md:mt-0">
-            Luxury waste management redefined.
+            Professional waste management service.
           </p>
         </div>
       </div>
