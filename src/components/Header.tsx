@@ -1,8 +1,15 @@
 import { Button } from "@/components/ui/enhanced-button"
 import { Phone, Menu } from "lucide-react"
 import { Link } from "react-router-dom"
+import { useAuth } from "@/contexts/AuthContext"
 
 const Header = () => {
+  const { user, signOut, userProfile } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
   return (
     <header className="fixed top-0 w-full bg-background/90 backdrop-blur-md border-b border-border z-50 animate-fade-in">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -25,7 +32,40 @@ const Header = () => {
             <Phone className="w-4 h-4" />
             <span className="font-medium">Call Elite Support</span>
           </a>
-          <Button variant="gold" size="sm" asChild className="hover-scale"><Link to="/dashboard">Property Dashboard</Link></Button>
+          
+          {user ? (
+            <div className="flex items-center space-x-4">
+              <span className="text-sm text-luxury-navy hidden sm:inline">
+                {userProfile?.first_name} {userProfile?.last_name}
+                {userProfile?.role && (
+                  <span className="text-xs text-muted-foreground ml-1">
+                    ({userProfile.role.replace('_', ' ')})
+                  </span>
+                )}
+              </span>
+              <Button variant="gold" size="sm" asChild className="hover-scale">
+                <Link to="/dashboard">Dashboard</Link>
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleSignOut}
+                className="hover-scale"
+              >
+                Sign Out
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-2">
+              <Button variant="ghost" size="sm" asChild className="hover-scale">
+                <Link to="/auth">Sign In</Link>
+              </Button>
+              <Button variant="gold" size="sm" asChild className="hover-scale">
+                <Link to="/auth">Get Started</Link>
+              </Button>
+            </div>
+          )}
+          
           <button className="md:hidden hover:scale-110 transition-transform duration-300">
             <Menu className="w-6 h-6 text-luxury-navy" />
           </button>

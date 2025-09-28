@@ -14,16 +14,277 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      apartments: {
+        Row: {
+          building: string
+          complex_id: string | null
+          created_at: string
+          floor_number: number | null
+          id: string
+          is_active: boolean
+          resident_id: string | null
+          unit_number: string
+          updated_at: string
+        }
+        Insert: {
+          building: string
+          complex_id?: string | null
+          created_at?: string
+          floor_number?: number | null
+          id?: string
+          is_active?: boolean
+          resident_id?: string | null
+          unit_number: string
+          updated_at?: string
+        }
+        Update: {
+          building?: string
+          complex_id?: string | null
+          created_at?: string
+          floor_number?: number | null
+          id?: string
+          is_active?: boolean
+          resident_id?: string | null
+          unit_number?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "apartments_complex_id_fkey"
+            columns: ["complex_id"]
+            isOneToOne: false
+            referencedRelation: "complexes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "apartments_resident_id_fkey"
+            columns: ["resident_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assignments: {
+        Row: {
+          apartment_ids: string[] | null
+          assignment_type: Database["public"]["Enums"]["assignment_type"]
+          complex_id: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          end_date: string | null
+          id: string
+          start_date: string
+          status: Database["public"]["Enums"]["assignment_status"]
+          updated_at: string
+          valet_id: string
+        }
+        Insert: {
+          apartment_ids?: string[] | null
+          assignment_type?: Database["public"]["Enums"]["assignment_type"]
+          complex_id?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          start_date: string
+          status?: Database["public"]["Enums"]["assignment_status"]
+          updated_at?: string
+          valet_id: string
+        }
+        Update: {
+          apartment_ids?: string[] | null
+          assignment_type?: Database["public"]["Enums"]["assignment_type"]
+          complex_id?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          start_date?: string
+          status?: Database["public"]["Enums"]["assignment_status"]
+          updated_at?: string
+          valet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assignments_complex_id_fkey"
+            columns: ["complex_id"]
+            isOneToOne: false
+            referencedRelation: "complexes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assignments_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assignments_valet_id_fkey"
+            columns: ["valet_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      complexes: {
+        Row: {
+          address: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          manager_id: string | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          manager_id?: string | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          manager_id?: string | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "complexes_manager_id_fkey"
+            columns: ["manager_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pickup_schedules: {
+        Row: {
+          apartment_id: string
+          created_at: string
+          created_by: string
+          id: string
+          notes: string | null
+          scheduled_date: string
+          scheduled_time: string
+          status: string
+          updated_at: string
+          valet_id: string | null
+        }
+        Insert: {
+          apartment_id: string
+          created_at?: string
+          created_by: string
+          id?: string
+          notes?: string | null
+          scheduled_date: string
+          scheduled_time: string
+          status?: string
+          updated_at?: string
+          valet_id?: string | null
+        }
+        Update: {
+          apartment_id?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          notes?: string | null
+          scheduled_date?: string
+          scheduled_time?: string
+          status?: string
+          updated_at?: string
+          valet_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pickup_schedules_apartment_id_fkey"
+            columns: ["apartment_id"]
+            isOneToOne: false
+            referencedRelation: "apartments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pickup_schedules_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pickup_schedules_valet_id_fkey"
+            columns: ["valet_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          phone_number: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone_number?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone_number?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_role: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["user_role"]
+      }
+      is_admin: {
+        Args: { _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      assignment_status: "pending" | "active" | "completed" | "cancelled"
+      assignment_type: "weekly" | "monthly" | "one_time" | "recurring"
+      user_role: "admin" | "elite_valet" | "resident"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +411,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      assignment_status: ["pending", "active", "completed", "cancelled"],
+      assignment_type: ["weekly", "monthly", "one_time", "recurring"],
+      user_role: ["admin", "elite_valet", "resident"],
+    },
   },
 } as const
