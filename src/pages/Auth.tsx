@@ -68,57 +68,46 @@ const Auth = () => {
     }
   };
 
-  // Dev bypass function
+  // Dev bypass function - creates a mock admin session
   const handleDevBypass = async () => {
     setLoading(true);
     try {
-      // Create a dev admin account or sign in with a proper email format
-      const devEmail = 'admin@example.com';
-      const devPassword = 'admin123';
+      // Create a mock user session directly in localStorage to bypass Supabase auth
+      const mockSession = {
+        access_token: 'dev-admin-token',
+        token_type: 'bearer',
+        expires_in: 3600,
+        expires_at: Date.now() + 3600000,
+        refresh_token: 'dev-refresh-token',
+        user: {
+          id: 'dev-admin-id',
+          email: 'admin@dev.local',
+          user_metadata: {
+            first_name: 'Dev',
+            last_name: 'Admin',
+            role: 'admin'
+          },
+          app_metadata: {},
+          aud: 'authenticated',
+          created_at: new Date().toISOString(),
+          role: 'authenticated'
+        }
+      };
       
-      // Try to sign in first
-      let { error } = await signIn(devEmail, devPassword);
-      
-      if (error && error.message.includes('Invalid login credentials')) {
-        // If sign in fails, create the account
-        const { error: signUpError } = await signUp(devEmail, devPassword, {
-          first_name: 'Dev',
-          last_name: 'Admin',
-          role: 'admin',
-        });
-        
-        if (signUpError && !signUpError.message.includes('already registered')) {
-          throw signUpError;
-        }
-        
-        // Wait a moment for account creation
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Promote to admin via database function
-        try {
-          await supabase.rpc('promote_user_to_admin', { user_email: devEmail });
-        } catch (rpcError) {
-          console.log('Admin promotion may have failed, but continuing...');
-        }
-        
-        // Now try to sign in again
-        const { error: signInError } = await signIn(devEmail, devPassword);
-        if (signInError) {
-          throw signInError;
-        }
-      } else if (error) {
-        throw error;
-      }
+      // Store the mock session
+      localStorage.setItem('supabase.auth.token', JSON.stringify(mockSession));
       
       toast({
         title: "Dev Admin Access",
-        description: "Signed in as development admin (admin@example.com)",
+        description: "Entered development admin mode",
       });
-      navigate('/dashboard');
+      
+      // Force page reload to trigger auth state change
+      window.location.href = '/dashboard';
     } catch (error: any) {
       toast({
         title: "Dev Bypass Failed",
-        description: error.message || "Could not create dev admin account",
+        description: error.message || "Could not enter dev mode",
         variant: "destructive",
       });
     } finally {
