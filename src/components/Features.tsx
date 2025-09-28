@@ -3,9 +3,9 @@ import { Award, Clock, Smartphone, Recycle, Building, Heart } from "lucide-react
 const features = [
   {
     icon: Clock,
-    title: "On-Time Guarantee",
-    description: "Every. Single. Time.",
-    detail: "Backup teams and redundancy plans ensure zero missed pickups, even during weather disruptions."
+    title: "Reliable Service",
+    description: "Consistent and dependable",
+    detail: "Professional service with backup plans to minimize disruptions and maintain consistent pickup schedules."
   },
   {
     icon: Award,

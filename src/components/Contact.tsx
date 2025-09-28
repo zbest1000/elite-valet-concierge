@@ -196,8 +196,8 @@ const Contact = () => {
                   Why Property Managers Choose Us
                 </h4>
                 <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li>• Reduces resident complaints by 95%</li>
-                  <li>• Eliminates hallway odors and spills</li>
+                  <li>• Significantly reduces resident complaints</li>
+                  <li>• Helps maintain clean hallways and common areas</li>
                   <li>• Flexible billing and payment options</li>
                   <li>• Detailed service reporting</li>
                   <li>• Emergency cleanup available</li>

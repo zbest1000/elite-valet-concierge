@@ -37,7 +37,7 @@ const Hero = () => {
               </div>
               <div className="flex items-center space-x-3 hover:translate-x-2 transition-transform duration-300">
                 <CheckCircle className="w-5 h-5 text-luxury-gold" />
-                <span className="text-foreground">On-Time Service Guarantee</span>
+                <span className="text-foreground">Reliable & Consistent Service</span>
               </div>
               <div className="flex items-center space-x-3 hover:translate-x-2 transition-transform duration-300">
                 <CheckCircle className="w-5 h-5 text-luxury-gold" />
@@ -57,7 +57,7 @@ const Hero = () => {
 
             <div className="pt-8 border-t border-border">
               <p className="text-sm text-muted-foreground">
-                Trusted by luxury communities across the nation
+                Serving communities across the nation with professional waste management
               </p>
             </div>
           </div>
@@ -74,7 +74,7 @@ const Hero = () => {
             
             <div className="absolute -bottom-4 -right-4 bg-white p-6 rounded-xl shadow-elegant hover:shadow-glow transition-all duration-300 hover:scale-110 animate-fade-in" style={{ animationDelay: '1.2s' }}>
               <div className="text-center">
-                <div className="text-2xl font-bold text-luxury-navy">100%</div>
+                <div className="text-2xl font-bold text-luxury-navy">99%+</div>
                 <div className="text-sm text-muted-foreground">Service Reliability</div>
               </div>
             </div>
