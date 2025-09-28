@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/enhanced-button"
 import { Phone, Menu } from "lucide-react"
+import { Link } from "react-router-dom"
 
 const Header = () => {
   return (
@@ -24,7 +25,7 @@ const Header = () => {
             <Phone className="w-4 h-4" />
             <span className="font-medium">Call Elite Support</span>
           </a>
-          <Button variant="gold" size="sm" className="hover-scale">Get Started</Button>
+          <Button variant="gold" size="sm" asChild className="hover-scale"><Link to="/dashboard">Property Dashboard</Link></Button>
           <button className="md:hidden hover:scale-110 transition-transform duration-300">
             <Menu className="w-6 h-6 text-luxury-navy" />
           </button>

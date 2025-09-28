@@ -4,6 +4,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Phone, Mail, MapPin, Clock, Building2 } from "lucide-react"
 import { useState } from "react"
+import { Link } from "react-router-dom"
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -123,7 +124,10 @@ const Contact = () => {
                   />
                 </div>
 
-                <Button type="submit" variant="luxury" size="xl" className="w-full hover-scale group">
+                <Button type="submit" variant="luxury" size="xl" className="w-full hover-scale group" asChild>
+                  <Link to="/dashboard">View Sample Dashboard</Link>
+                </Button>
+                <Button type="submit" variant="premium" size="xl" className="w-full hover-scale group">
                   Request Custom Quote
                   <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
                 </Button>
