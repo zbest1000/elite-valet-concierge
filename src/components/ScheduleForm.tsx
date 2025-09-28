@@ -101,7 +101,7 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({ onSuccess, onCancel }) => {
     if (formData.target_type === 'building' || formData.target_type === 'floor') {
       updateBuildingsAndFloors();
     }
-  }, [formData.complex_id, apartments]);
+  }, [formData.complex_id, formData.building, apartments]);
 
   const fetchData = async () => {
     await Promise.all([fetchApartments(), fetchComplexes()]);
