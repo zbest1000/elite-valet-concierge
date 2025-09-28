@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar } from '@/components/ui/calendar';
 import { useToast } from '@/hooks/use-toast';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { 
   CalendarIcon, 
   Clock, 
@@ -19,9 +20,11 @@ import {
   Building,
   Settings,
   Plus,
-  Edit
+  Edit,
+  Menu,
+  LogOut
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import ScheduleForm from '@/components/ScheduleForm';
@@ -76,9 +79,24 @@ interface Assignment {
 }
 
 const ImprovedDashboard = () => {
-  const { user, userProfile } = useAuth();
+  const { user, userProfile, signOut } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [selectedDate, setSelectedDate] = useState<Date>();
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate('/auth');
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to sign out",
+        variant: "destructive",
+      });
+    }
+  };
   const [schedules, setSchedules] = useState<PickupSchedule[]>([]);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -335,14 +353,57 @@ const ImprovedDashboard = () => {
                 </span>
               </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-muted-foreground hidden sm:inline">
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-2">
+              <span className="text-sm text-muted-foreground">
                 Welcome, {userProfile?.first_name}
               </span>
               <Button variant="outline" size="sm">
-                <Settings className="w-4 h-4 sm:mr-2" />
-                <span className="hidden sm:inline">Settings</span>
+                <Settings className="w-4 h-4 mr-2" />
+                Settings
               </Button>
+              <Button variant="outline" size="sm" onClick={handleSignOut}>
+                <LogOut className="w-4 h-4 mr-2" />
+                Sign Out
+              </Button>
+            </div>
+
+            {/* Mobile Menu */}
+            <div className="md:hidden">
+              <Sheet open={showMobileMenu} onOpenChange={setShowMobileMenu}>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Menu className="w-4 h-4" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-80">
+                  <div className="flex flex-col h-full">
+                    <div className="flex items-center space-x-2 mb-6">
+                      <div className="w-8 h-8 bg-gradient-gold rounded-full flex items-center justify-center">
+                        <span className="text-luxury-navy font-bold text-sm">EV</span>
+                      </div>
+                      <span className="font-bold text-luxury-navy">Elite Valet</span>
+                    </div>
+
+                    <div className="space-y-4 flex-1">
+                      <div className="text-sm text-muted-foreground">
+                        Welcome, {userProfile?.first_name} {userProfile?.last_name}
+                      </div>
+                      
+                      <div className="border-t pt-4 space-y-2">
+                        <Button variant="ghost" className="w-full justify-start" onClick={() => setShowMobileMenu(false)}>
+                          <Settings className="w-4 h-4 mr-2" />
+                          Settings
+                        </Button>
+                        <Button variant="ghost" className="w-full justify-start" onClick={handleSignOut}>
+                          <LogOut className="w-4 h-4 mr-2" />
+                          Sign Out
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
             </div>
           </div>
         </div>

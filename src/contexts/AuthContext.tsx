@@ -148,7 +148,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
+    // Clear dev session first
     localStorage.removeItem('dev-admin-session');
+    
+    // Clear all auth state
+    setUser(null);
+    setSession(null);
+    setUserProfile(null);
+    
+    // Sign out from Supabase
     await supabase.auth.signOut();
   };
 
