@@ -172,7 +172,7 @@ export type Database = {
       }
       pickup_schedules: {
         Row: {
-          apartment_id: string
+          apartment_id: string | null
           building: string | null
           complex_id: string | null
           created_at: string
@@ -197,7 +197,7 @@ export type Database = {
           valet_id: string | null
         }
         Insert: {
-          apartment_id: string
+          apartment_id?: string | null
           building?: string | null
           complex_id?: string | null
           created_at?: string
@@ -222,7 +222,7 @@ export type Database = {
           valet_id?: string | null
         }
         Update: {
-          apartment_id?: string
+          apartment_id?: string | null
           building?: string | null
           complex_id?: string | null
           created_at?: string
