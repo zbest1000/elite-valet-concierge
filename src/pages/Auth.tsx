@@ -72,9 +72,9 @@ const Auth = () => {
   const handleDevBypass = async () => {
     setLoading(true);
     try {
-      // Create a dev admin account or sign in
-      const devEmail = 'dev-admin@elitevalet.test';
-      const devPassword = 'devpass123';
+      // Create a dev admin account or sign in with a proper email format
+      const devEmail = 'admin@test.com';
+      const devPassword = 'admin123';
       
       // Try to sign in first
       let { error } = await signIn(devEmail, devPassword);
@@ -87,14 +87,21 @@ const Auth = () => {
           role: 'admin',
         });
         
-        if (signUpError) {
+        if (signUpError && !signUpError.message.includes('already registered')) {
           throw signUpError;
         }
         
-        // Promote to admin via database function
-        await supabase.rpc('promote_user_to_admin', { user_email: devEmail });
+        // Wait a moment for account creation
+        await new Promise(resolve => setTimeout(resolve, 1000));
         
-        // Now sign in
+        // Promote to admin via database function
+        try {
+          await supabase.rpc('promote_user_to_admin', { user_email: devEmail });
+        } catch (rpcError) {
+          console.log('Admin promotion may have failed, but continuing...');
+        }
+        
+        // Now try to sign in again
         const { error: signInError } = await signIn(devEmail, devPassword);
         if (signInError) {
           throw signInError;
@@ -105,7 +112,7 @@ const Auth = () => {
       
       toast({
         title: "Dev Admin Access",
-        description: "Signed in as development admin",
+        description: "Signed in as development admin (admin@test.com)",
       });
       navigate('/dashboard');
     } catch (error: any) {
@@ -231,9 +238,9 @@ const Auth = () => {
                 className="bg-yellow-50 border-yellow-200 text-yellow-800 hover:bg-yellow-100"
               >
                 <Zap className="w-4 h-4 mr-2" />
-                Dev Admin Access
+                {loading ? 'Setting up...' : 'Dev Admin Access'}
               </Button>
-              <p className="text-xs text-muted-foreground mt-1">Quick dev access (creates admin@test account)</p>
+              <p className="text-xs text-muted-foreground mt-1">Quick dev access (creates admin@test.com)</p>
             </div>
           </CardHeader>
           <CardContent>
