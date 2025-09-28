@@ -33,9 +33,9 @@ const features = [
   },
   {
     icon: Heart,
-    title: "Customer-Centric",
-    description: "Personalized experience",
-    detail: "Concierge perks, loyalty rewards, and service that makes you feel truly valued and heard."
+    title: "Customer-Focused",
+    description: "Personal attention",
+    detail: "We listen to your needs and work hard to provide friendly, professional service that you can count on."
   }
 ]
 
