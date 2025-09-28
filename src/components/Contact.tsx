@@ -32,17 +32,17 @@ const Contact = () => {
     <section id="contact" className="py-20 bg-background">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-5xl font-bold text-luxury-navy mb-4">
+          <div className="text-center mb-16 animate-fade-in">
+            <h2 className="text-3xl lg:text-5xl font-bold text-luxury-navy mb-4 animate-scale-in">
               Partner with EliteValet
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
               Transform your property's waste management with our premium valet service designed for luxury apartment complexes.
             </p>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-12">
-            <div className="bg-gradient-subtle p-8 rounded-2xl border border-border">
+            <div className="bg-gradient-subtle p-8 rounded-2xl border border-border animate-slide-in-left hover:shadow-elegant transition-all duration-300">
               <h3 className="text-2xl font-semibold text-luxury-navy mb-6">
                 Request Property Assessment
               </h3>
@@ -123,31 +123,32 @@ const Contact = () => {
                   />
                 </div>
 
-                <Button type="submit" variant="luxury" size="xl" className="w-full">
+                <Button type="submit" variant="luxury" size="xl" className="w-full hover-scale group">
                   Request Custom Quote
+                  <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
                 </Button>
               </form>
             </div>
 
-            <div className="space-y-8">
+            <div className="space-y-8 animate-slide-in-right">
               <div>
                 <h3 className="text-2xl font-semibold text-luxury-navy mb-6">
                   Standard Service Schedule
                 </h3>
-                <div className="bg-white/50 p-6 rounded-xl border border-border space-y-4">
-                  <div className="flex items-center justify-between">
+                <div className="bg-white/50 p-6 rounded-xl border border-border space-y-4 hover:shadow-elegant transition-all duration-300">
+                  <div className="flex items-center justify-between hover:translate-x-2 transition-transform duration-300">
                     <span className="font-medium text-luxury-navy">Evening Collection</span>
                     <span className="text-muted-foreground">7:00 PM - 10:00 PM</span>
                   </div>
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between hover:translate-x-2 transition-transform duration-300">
                     <span className="font-medium text-luxury-navy">Frequency</span>
                     <span className="text-muted-foreground">Sunday - Thursday</span>
                   </div>
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between hover:translate-x-2 transition-transform duration-300">
                     <span className="font-medium text-luxury-navy">Weekend Service</span>
                     <span className="text-muted-foreground">Available upon request</span>
                   </div>
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between hover:translate-x-2 transition-transform duration-300">
                     <span className="font-medium text-luxury-navy">Holiday Coverage</span>
                     <span className="text-muted-foreground">Maintained schedule</span>
                   </div>
