@@ -10,17 +10,25 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Checkbox } from '@/components/ui/checkbox';
 import { format } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Building, Home, Layers, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface Apartment {
   id: string;
   unit_number: string;
   building: string;
+  floor_number: number;
   complex?: {
+    id: string;
     name: string;
   };
+}
+
+interface Complex {
+  id: string;
+  name: string;
 }
 
 interface ScheduleFormProps {
@@ -28,21 +36,39 @@ interface ScheduleFormProps {
   onCancel: () => void;
 }
 
+const DAYS_OF_WEEK = [
+  { value: 0, label: 'Sunday', short: 'Sun' },
+  { value: 1, label: 'Monday', short: 'Mon' },
+  { value: 2, label: 'Tuesday', short: 'Tue' },
+  { value: 3, label: 'Wednesday', short: 'Wed' },
+  { value: 4, label: 'Thursday', short: 'Thu' },
+  { value: 5, label: 'Friday', short: 'Fri' },
+  { value: 6, label: 'Saturday', short: 'Sat' },
+];
+
 const ScheduleForm: React.FC<ScheduleFormProps> = ({ onSuccess, onCancel }) => {
   const { userProfile } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [apartments, setApartments] = useState<Apartment[]>([]);
-  const [selectedDate, setSelectedDate] = useState<Date>();
+  const [complexes, setComplexes] = useState<Complex[]>([]);
+  const [buildings, setBuildings] = useState<string[]>([]);
+  const [floors, setFloors] = useState<number[]>([]);
+  const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
   const [formData, setFormData] = useState({
+    target_type: 'apartment',
     apartment_id: '',
-    scheduled_time: '',
+    complex_id: '',
+    building: '',
+    floor_number: '',
+    start_time: '',
+    end_time: '',
     notes: '',
     recurrence_type: 'none',
     recurrence_days: [] as number[],
   });
-  
+
   // Input validation
   const validateInputs = () => {
     const errors: string[] = [];
@@ -51,10 +77,16 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({ onSuccess, onCancel }) => {
       errors.push('Notes must be less than 1000 characters');
     }
     
-    if (formData.scheduled_time) {
-      const [hours] = formData.scheduled_time.split(':').map(Number);
-      if (hours < 6 || hours > 22) {
-        errors.push('Pickup time must be between 6:00 AM and 10:00 PM');
+    if (formData.start_time && formData.end_time) {
+      const [startHours] = formData.start_time.split(':').map(Number);
+      const [endHours] = formData.end_time.split(':').map(Number);
+      
+      if (startHours < 6 || startHours > 22 || endHours < 6 || endHours > 22) {
+        errors.push('Pickup times must be between 6:00 AM and 10:00 PM');
+      }
+      
+      if (formData.start_time >= formData.end_time) {
+        errors.push('End time must be after start time');
       }
     }
     
@@ -62,8 +94,18 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({ onSuccess, onCancel }) => {
   };
 
   useEffect(() => {
-    fetchApartments();
+    fetchData();
   }, []);
+
+  useEffect(() => {
+    if (formData.target_type === 'building' || formData.target_type === 'floor') {
+      updateBuildingsAndFloors();
+    }
+  }, [formData.complex_id, apartments]);
+
+  const fetchData = async () => {
+    await Promise.all([fetchApartments(), fetchComplexes()]);
+  };
 
   const fetchApartments = async () => {
     try {
@@ -73,11 +115,12 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({ onSuccess, onCancel }) => {
           id,
           unit_number,
           building,
-          complex:complexes(name)
+          floor_number,
+          complex:complexes(id, name)
         `)
         .eq('is_active', true)
-        .order('building')
-        .order('unit_number');
+        .order('building', { ascending: true })
+        .order('unit_number', { ascending: true });
 
       if (error) throw error;
       setApartments(data || []);
@@ -89,6 +132,66 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({ onSuccess, onCancel }) => {
         variant: "destructive",
       });
     }
+  };
+
+  const fetchComplexes = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('complexes')
+        .select('id, name')
+        .eq('is_active', true)
+        .order('name', { ascending: true });
+
+      if (error) throw error;
+      setComplexes(data || []);
+    } catch (error) {
+      console.error('Error fetching complexes:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load complexes",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const updateBuildingsAndFloors = () => {
+    const selectedComplexApartments = apartments.filter(apt => 
+      apt.complex?.id === formData.complex_id
+    );
+    
+    const uniqueBuildings = [...new Set(selectedComplexApartments.map(apt => apt.building))];
+    setBuildings(uniqueBuildings.sort());
+    
+    if (formData.target_type === 'floor' && formData.building) {
+      const buildingApartments = selectedComplexApartments.filter(apt => 
+        apt.building === formData.building
+      );
+      const uniqueFloors = [...new Set(buildingApartments.map(apt => apt.floor_number))]
+        .filter(floor => floor !== null && floor !== undefined)
+        .sort((a, b) => a - b);
+      setFloors(uniqueFloors);
+    }
+  };
+
+  const handleDayToggle = (dayValue: number) => {
+    const updatedDays = formData.recurrence_days.includes(dayValue)
+      ? formData.recurrence_days.filter(day => day !== dayValue)
+      : [...formData.recurrence_days, dayValue].sort();
+    
+    setFormData(prev => ({ ...prev, recurrence_days: updatedDays }));
+  };
+
+  const handleTargetTypeChange = (value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      target_type: value,
+      apartment_id: '',
+      complex_id: '',
+      building: '',
+      floor_number: '',
+    }));
+    setBuildings([]);
+    setFloors([]);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -105,7 +208,7 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({ onSuccess, onCancel }) => {
       return;
     }
     
-    if (!selectedDate || !formData.apartment_id || !formData.scheduled_time) {
+    if (!startDate || !endDate || !formData.start_time || !formData.end_time) {
       toast({
         title: "Validation Error",
         description: "Please fill in all required fields",
@@ -114,10 +217,47 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({ onSuccess, onCancel }) => {
       return;
     }
 
-    if (formData.recurrence_type !== 'none' && (!endDate || endDate <= selectedDate)) {
+    if (formData.recurrence_type !== 'none' && formData.recurrence_days.length === 0) {
       toast({
         title: "Validation Error", 
-        description: "Please select a valid end date for recurring schedules",
+        description: "Please select days for recurring schedules",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate target selection based on type
+    if (formData.target_type === 'apartment' && !formData.apartment_id) {
+      toast({
+        title: "Validation Error",
+        description: "Please select an apartment",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (formData.target_type === 'complex' && !formData.complex_id) {
+      toast({
+        title: "Validation Error",
+        description: "Please select a complex",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (formData.target_type === 'building' && (!formData.complex_id || !formData.building)) {
+      toast({
+        title: "Validation Error",
+        description: "Please select a complex and building",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (formData.target_type === 'floor' && (!formData.complex_id || !formData.building || !formData.floor_number)) {
+      toast({
+        title: "Validation Error",
+        description: "Please select a complex, building, and floor",
         variant: "destructive",
       });
       return;
@@ -125,35 +265,44 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({ onSuccess, onCancel }) => {
 
     setLoading(true);
     try {
-      if (formData.recurrence_type === 'none') {
-        // Create single schedule
-        const { error } = await supabase
-          .from('pickup_schedules')
-          .insert({
-            apartment_id: formData.apartment_id,
-            scheduled_date: format(selectedDate, 'yyyy-MM-dd'),
-            scheduled_time: formData.scheduled_time,
-            status: 'scheduled',
-            notes: formData.notes || null,
-            created_by: userProfile.id,
-            recurrence_type: 'none',
-          });
+      const scheduleData = {
+        start_date: format(startDate, 'yyyy-MM-dd'),
+        end_date: format(endDate, 'yyyy-MM-dd'),
+        schedule_time_start: formData.start_time,
+        schedule_time_end: formData.end_time,
+        status: 'scheduled',
+        notes: formData.notes || null,
+        created_by: userProfile.id,
+        recurrence_type: formData.recurrence_type,
+        recurrence_days: formData.recurrence_days.length > 0 ? formData.recurrence_days : null,
+        recurrence_end_date: formData.recurrence_type !== 'none' ? format(endDate, 'yyyy-MM-dd') : null,
+        target_type: formData.target_type,
+        apartment_id: formData.target_type === 'apartment' ? formData.apartment_id : null,
+        complex_id: formData.target_type !== 'apartment' ? formData.complex_id : null,
+        building: formData.target_type === 'building' || formData.target_type === 'floor' ? formData.building : null,
+        floor_number: formData.target_type === 'floor' ? parseInt(formData.floor_number) : null,
+        // Legacy fields for compatibility
+        scheduled_date: format(startDate, 'yyyy-MM-dd'),
+        scheduled_time: formData.start_time,
+      };
 
-        if (error) throw error;
-      } else {
-        // Create recurring schedules
-        await createRecurringSchedules();
-      }
+      const { error } = await supabase
+        .from('pickup_schedules')
+        .insert(scheduleData);
+
+      if (error) throw error;
 
       toast({
         title: "Success",
         description: "Pickup schedule created successfully",
       });
+      
       onSuccess();
     } catch (error: any) {
+      console.error('Error creating schedule:', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to create schedule",
+        description: error.message || "Failed to create pickup schedule",
         variant: "destructive",
       });
     } finally {
@@ -161,78 +310,14 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({ onSuccess, onCancel }) => {
     }
   };
 
-  const createRecurringSchedules = async () => {
-    const schedules = [];
-    const currentDate = new Date(selectedDate!);
-    const endDateTime = new Date(endDate!);
-    
-    while (currentDate <= endDateTime) {
-      let shouldCreateSchedule = false;
-      
-      if (formData.recurrence_type === 'daily') {
-        shouldCreateSchedule = formData.recurrence_days.length === 0 || 
-          formData.recurrence_days.includes(currentDate.getDay());
-      } else if (formData.recurrence_type === 'weekly') {
-        shouldCreateSchedule = formData.recurrence_days.includes(currentDate.getDay());
-      } else if (formData.recurrence_type === 'bi-weekly') {
-        const weeksDiff = Math.floor((currentDate.getTime() - selectedDate!.getTime()) / (7 * 24 * 60 * 60 * 1000));
-        shouldCreateSchedule = weeksDiff % 2 === 0 && formData.recurrence_days.includes(currentDate.getDay());
-      }
-      
-      if (shouldCreateSchedule) {
-        schedules.push({
-          apartment_id: formData.apartment_id,
-          scheduled_date: format(currentDate, 'yyyy-MM-dd'),
-          scheduled_time: formData.scheduled_time,
-          status: 'scheduled',
-          notes: formData.notes || null,
-          created_by: userProfile.id,
-          recurrence_type: formData.recurrence_type,
-          recurrence_days: formData.recurrence_days.length > 0 ? formData.recurrence_days : null,
-          recurrence_end_date: format(endDate!, 'yyyy-MM-dd'),
-          is_recurring_parent: schedules.length === 0,
-        });
-      }
-      
-      currentDate.setDate(currentDate.getDate() + 1);
+  const getTargetIcon = (type: string) => {
+    switch (type) {
+      case 'apartment': return <Home className="w-4 h-4" />;
+      case 'building': return <Building className="w-4 h-4" />;
+      case 'floor': return <Layers className="w-4 h-4" />;
+      case 'complex': return <MapPin className="w-4 h-4" />;
+      default: return <Home className="w-4 h-4" />;
     }
-    
-    if (schedules.length === 0) {
-      throw new Error('No schedules would be created with the selected recurrence pattern');
-    }
-    
-    const { data: parentSchedule, error: parentError } = await supabase
-      .from('pickup_schedules')
-      .insert(schedules[0])
-      .select()
-      .single();
-      
-    if (parentError) throw parentError;
-    
-    if (schedules.length > 1) {
-      const childSchedules = schedules.slice(1).map(schedule => ({
-        ...schedule,
-        parent_schedule_id: parentSchedule.id,
-        is_recurring_parent: false,
-      }));
-      
-      const { error: childError } = await supabase
-        .from('pickup_schedules')
-        .insert(childSchedules);
-        
-      if (childError) throw childError;
-    }
-  };
-
-  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  
-  const toggleDay = (dayIndex: number) => {
-    setFormData(prev => ({
-      ...prev,
-      recurrence_days: prev.recurrence_days.includes(dayIndex)
-        ? prev.recurrence_days.filter(d => d !== dayIndex)
-        : [...prev.recurrence_days, dayIndex].sort()
-    }));
   };
 
   const getPresetDays = (preset: string) => {
@@ -244,187 +329,276 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({ onSuccess, onCancel }) => {
     }
   };
 
+  const setPresetDays = (preset: string) => {
+    const days = getPresetDays(preset);
+    setFormData(prev => ({ ...prev, recurrence_days: days }));
+  };
+
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full max-w-2xl">
       <CardHeader>
         <CardTitle>Create Pickup Schedule</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="apartment">Apartment</Label>
-            <Select value={formData.apartment_id} onValueChange={(value) => setFormData(prev => ({ ...prev, apartment_id: value }))}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select apartment" />
-              </SelectTrigger>
-              <SelectContent>
-                {apartments.map((apartment) => (
-                  <SelectItem key={apartment.id} value={apartment.id}>
-                    {apartment.building} - Unit {apartment.unit_number}
-                    {apartment.complex?.name && ` (${apartment.complex.name})`}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Scheduled Date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Target Type Selection */}
+          <div className="space-y-3">
+            <Label>Pickup Target</Label>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { value: 'apartment', label: 'Specific Unit', icon: <Home className="w-4 h-4" /> },
+                { value: 'building', label: 'Entire Building', icon: <Building className="w-4 h-4" /> },
+                { value: 'floor', label: 'Building Floor', icon: <Layers className="w-4 h-4" /> },
+                { value: 'complex', label: 'Entire Complex', icon: <MapPin className="w-4 h-4" /> },
+              ].map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => handleTargetTypeChange(option.value)}
                   className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !selectedDate && "text-muted-foreground"
+                    "flex items-center gap-2 p-3 rounded-lg border text-left transition-colors",
+                    formData.target_type === option.value
+                      ? "bg-primary/10 border-primary text-primary"
+                      : "bg-background border-border hover:bg-muted"
                   )}
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={setSelectedDate}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
+                  {option.icon}
+                  <span className="text-sm font-medium">{option.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="time">Scheduled Time</Label>
-            <Input
-              id="time"
-              type="time"
-              value={formData.scheduled_time}
-              onChange={(e) => setFormData(prev => ({ ...prev, scheduled_time: e.target.value }))}
-              required
-            />
+          {/* Target Selection Based on Type */}
+          {formData.target_type === 'apartment' && (
+            <div className="space-y-2">
+              <Label htmlFor="apartment">Select Apartment</Label>
+              <Select value={formData.apartment_id} onValueChange={(value) => setFormData(prev => ({ ...prev, apartment_id: value }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select apartment" />
+                </SelectTrigger>
+                <SelectContent>
+                  {apartments.map((apartment) => (
+                    <SelectItem key={apartment.id} value={apartment.id}>
+                      {apartment.complex?.name} - {apartment.building} #{apartment.unit_number}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {(formData.target_type === 'complex' || formData.target_type === 'building' || formData.target_type === 'floor') && (
+            <div className="space-y-2">
+              <Label htmlFor="complex">Select Complex</Label>
+              <Select value={formData.complex_id} onValueChange={(value) => setFormData(prev => ({ ...prev, complex_id: value, building: '', floor_number: '' }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select complex" />
+                </SelectTrigger>
+                <SelectContent>
+                  {complexes.map((complex) => (
+                    <SelectItem key={complex.id} value={complex.id}>
+                      {complex.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {(formData.target_type === 'building' || formData.target_type === 'floor') && formData.complex_id && (
+            <div className="space-y-2">
+              <Label htmlFor="building">Select Building</Label>
+              <Select value={formData.building} onValueChange={(value) => setFormData(prev => ({ ...prev, building: value, floor_number: '' }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select building" />
+                </SelectTrigger>
+                <SelectContent>
+                  {buildings.map((building) => (
+                    <SelectItem key={building} value={building}>
+                      Building {building}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {formData.target_type === 'floor' && formData.building && (
+            <div className="space-y-2">
+              <Label htmlFor="floor">Select Floor</Label>
+              <Select value={formData.floor_number} onValueChange={(value) => setFormData(prev => ({ ...prev, floor_number: value }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select floor" />
+                </SelectTrigger>
+                <SelectContent>
+                  {floors.map((floor) => (
+                    <SelectItem key={floor} value={floor.toString()}>
+                      Floor {floor}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {/* Date Range */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Start Date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !startDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {startDate ? format(startDate, "PPP") : <span>Pick start date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={startDate}
+                    onSelect={setStartDate}
+                    initialFocus
+                    className="pointer-events-auto"
+                    disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div className="space-y-2">
+              <Label>End Date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !endDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {endDate ? format(endDate, "PPP") : <span>Pick end date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={endDate}
+                    onSelect={setEndDate}
+                    initialFocus
+                    className="pointer-events-auto"
+                    disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0)) || (startDate && date < startDate)}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="notes">Notes (Optional)</Label>
-            <Textarea
-              id="notes"
-              placeholder="Any special instructions or notes..."
-              value={formData.notes}
-              onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-              rows={3}
-            />
+          {/* Time Range */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="start-time">Start Time</Label>
+              <Input
+                id="start-time"
+                type="time"
+                value={formData.start_time}
+                onChange={(e) => setFormData(prev => ({ ...prev, start_time: e.target.value }))}
+                min="06:00"
+                max="22:00"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="end-time">End Time</Label>
+              <Input
+                id="end-time"
+                type="time"
+                value={formData.end_time}
+                onChange={(e) => setFormData(prev => ({ ...prev, end_time: e.target.value }))}
+                min="06:00"
+                max="22:00"
+                required
+              />
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label>Recurrence</Label>
+          {/* Recurrence */}
+          <div className="space-y-3">
+            <Label htmlFor="recurrence">Recurrence Type</Label>
             <Select value={formData.recurrence_type} onValueChange={(value) => setFormData(prev => ({ ...prev, recurrence_type: value, recurrence_days: [] }))}>
               <SelectTrigger>
                 <SelectValue placeholder="Select recurrence" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">No Recurrence</SelectItem>
+                <SelectItem value="none">One-time</SelectItem>
                 <SelectItem value="daily">Daily</SelectItem>
                 <SelectItem value="weekly">Weekly</SelectItem>
-                <SelectItem value="bi-weekly">Bi-Weekly</SelectItem>
+                <SelectItem value="bi-weekly">Bi-weekly</SelectItem>
               </SelectContent>
             </Select>
-          </div>
 
-          {formData.recurrence_type !== 'none' && (
-            <>
-              <div className="space-y-2">
-                <Label>Days of Week</Label>
-                <div className="space-y-2">
-                  <div className="flex gap-2 text-sm">
-                    <Button
-                      type="button"
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => setFormData(prev => ({ ...prev, recurrence_days: getPresetDays('weekdays') }))}
-                    >
-                      Weekdays
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm" 
-                      onClick={() => setFormData(prev => ({ ...prev, recurrence_days: getPresetDays('sun-thurs') }))}
-                    >
-                      Sun-Thu
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setFormData(prev => ({ ...prev, recurrence_days: getPresetDays('weekends') }))}
-                    >
-                      Weekends
-                    </Button>
-                  </div>
-                  <div className="grid grid-cols-4 gap-2">
-                    {dayNames.map((day, index) => (
-                      <Button
-                        key={day}
-                        type="button"
-                        variant={formData.recurrence_days.includes(index) ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => toggleDay(index)}
-                        className="text-xs"
-                      >
-                        {day.slice(0, 3)}
-                      </Button>
-                    ))}
-                  </div>
+            {formData.recurrence_type !== 'none' && (
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <Button type="button" size="sm" variant="outline" onClick={() => setPresetDays('weekdays')}>
+                    Weekdays
+                  </Button>
+                  <Button type="button" size="sm" variant="outline" onClick={() => setPresetDays('sun-thurs')}>
+                    Sun-Thu
+                  </Button>
+                  <Button type="button" size="sm" variant="outline" onClick={() => setPresetDays('weekends')}>
+                    Weekends
+                  </Button>
+                </div>
+                
+                <div className="grid grid-cols-7 gap-2">
+                  {DAYS_OF_WEEK.map((day) => (
+                    <div key={day.value} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`day-${day.value}`}
+                        checked={formData.recurrence_days.includes(day.value)}
+                        onCheckedChange={() => handleDayToggle(day.value)}
+                      />
+                      <Label htmlFor={`day-${day.value}`} className="text-sm">
+                        {day.short}
+                      </Label>
+                    </div>
+                  ))}
                 </div>
               </div>
+            )}
+          </div>
 
-              <div className="space-y-2">
-                <Label>End Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !endDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {endDate ? format(endDate, "PPP") : <span>Pick end date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={endDate}
-                      onSelect={setEndDate}
-                      disabled={(date) => selectedDate ? date <= selectedDate : date <= new Date()}
-                      initialFocus
-                      className="pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </>
-          )}
-
+          {/* Notes */}
           <div className="space-y-2">
             <Label htmlFor="notes">Notes (Optional)</Label>
             <Textarea
               id="notes"
-              placeholder="Any special instructions or notes..."
               value={formData.notes}
               onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+              placeholder="Any special instructions or notes..."
+              maxLength={1000}
               rows={3}
             />
+            <p className="text-xs text-muted-foreground">
+              {formData.notes.length}/1000 characters
+            </p>
           </div>
 
-          <div className="flex space-x-2 pt-4">
+          {/* Action Buttons */}
+          <div className="flex gap-3 pt-4">
             <Button type="button" variant="outline" onClick={onCancel} className="flex-1">
               Cancel
             </Button>
-            <Button type="submit" variant="gold" disabled={loading} className="flex-1">
+            <Button type="submit" disabled={loading} className="flex-1">
               {loading ? 'Creating...' : 'Create Schedule'}
             </Button>
           </div>

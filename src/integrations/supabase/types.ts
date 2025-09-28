@@ -173,8 +173,12 @@ export type Database = {
       pickup_schedules: {
         Row: {
           apartment_id: string
+          building: string | null
+          complex_id: string | null
           created_at: string
           created_by: string
+          end_date: string | null
+          floor_number: number | null
           id: string
           is_recurring_parent: boolean | null
           notes: string | null
@@ -182,16 +186,24 @@ export type Database = {
           recurrence_days: number[] | null
           recurrence_end_date: string | null
           recurrence_type: string | null
+          schedule_time_end: string | null
+          schedule_time_start: string | null
           scheduled_date: string
           scheduled_time: string
+          start_date: string | null
           status: string
+          target_type: string | null
           updated_at: string
           valet_id: string | null
         }
         Insert: {
           apartment_id: string
+          building?: string | null
+          complex_id?: string | null
           created_at?: string
           created_by: string
+          end_date?: string | null
+          floor_number?: number | null
           id?: string
           is_recurring_parent?: boolean | null
           notes?: string | null
@@ -199,16 +211,24 @@ export type Database = {
           recurrence_days?: number[] | null
           recurrence_end_date?: string | null
           recurrence_type?: string | null
+          schedule_time_end?: string | null
+          schedule_time_start?: string | null
           scheduled_date: string
           scheduled_time: string
+          start_date?: string | null
           status?: string
+          target_type?: string | null
           updated_at?: string
           valet_id?: string | null
         }
         Update: {
           apartment_id?: string
+          building?: string | null
+          complex_id?: string | null
           created_at?: string
           created_by?: string
+          end_date?: string | null
+          floor_number?: number | null
           id?: string
           is_recurring_parent?: boolean | null
           notes?: string | null
@@ -216,9 +236,13 @@ export type Database = {
           recurrence_days?: number[] | null
           recurrence_end_date?: string | null
           recurrence_type?: string | null
+          schedule_time_end?: string | null
+          schedule_time_start?: string | null
           scheduled_date?: string
           scheduled_time?: string
+          start_date?: string | null
           status?: string
+          target_type?: string | null
           updated_at?: string
           valet_id?: string | null
         }
