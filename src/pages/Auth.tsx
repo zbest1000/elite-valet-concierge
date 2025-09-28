@@ -73,7 +73,7 @@ const Auth = () => {
     setLoading(true);
     try {
       // Create a dev admin account or sign in with a proper email format
-      const devEmail = 'admin@test.com';
+      const devEmail = 'admin@example.com';
       const devPassword = 'admin123';
       
       // Try to sign in first
@@ -112,7 +112,7 @@ const Auth = () => {
       
       toast({
         title: "Dev Admin Access",
-        description: "Signed in as development admin (admin@test.com)",
+        description: "Signed in as development admin (admin@example.com)",
       });
       navigate('/dashboard');
     } catch (error: any) {
@@ -240,7 +240,7 @@ const Auth = () => {
                 <Zap className="w-4 h-4 mr-2" />
                 {loading ? 'Setting up...' : 'Dev Admin Access'}
               </Button>
-              <p className="text-xs text-muted-foreground mt-1">Quick dev access (creates admin@test.com)</p>
+              <p className="text-xs text-muted-foreground mt-1">Quick dev access (creates admin@example.com)</p>
             </div>
           </CardHeader>
           <CardContent>
@@ -259,7 +259,7 @@ const Auth = () => {
                       type="email"
                       value={formData.email}
                       onChange={(e) => handleInputChange('email', e.target.value)}
-                      placeholder="admin@test.com"
+                        placeholder="admin@example.com"
                       required
                     />
                     {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
@@ -333,7 +333,7 @@ const Auth = () => {
                       type="email"
                       value={formData.email}
                       onChange={(e) => handleInputChange('email', e.target.value)}
-                      placeholder="admin@test.com"
+                      placeholder="admin@example.com"
                       required
                     />
                     {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
