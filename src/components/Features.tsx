@@ -27,9 +27,9 @@ const features = [
   },
   {
     icon: Building,
-    title: "Premium Integration",
+    title: "Property Integration",
     description: "Seamless coordination",
-    detail: "Designed to work flawlessly with luxury building management and HOA requirements."
+    detail: "Designed to work flawlessly with any building management system and property requirements."
   },
   {
     icon: Heart,
@@ -47,8 +47,8 @@ const Features = () => {
           <h2 className="text-3xl lg:text-5xl font-bold mb-4 animate-scale-in">
             The Luxury Touch
           </h2>
-          <p className="text-lg text-white/80 max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            What sets us apart is our unwavering attention to detail and commitment to excellence in every interaction.
+          <p className="text-lg text-white/80 max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: "0.2s" }}>
+            What sets us apart is our unwavering attention to detail and commitment to excellence for every property we serve.
           </p>
         </div>
 
@@ -81,9 +81,9 @@ const Features = () => {
           })}
         </div>
 
-        <div className="mt-16 text-center animate-fade-in" style={{ animationDelay: '0.8s' }}>
+        <div className="mt-16 text-center animate-fade-in" style={{ animationDelay: "0.8s" }}>
           <blockquote className="text-2xl lg:text-3xl font-light italic text-white/90 max-w-3xl mx-auto hover:scale-105 transition-transform duration-300">
-            "Because luxury isn't just about what we do—it's about how we make you feel: 
+            "Premium service isn't about the property—it's about how we make you feel: 
             <span className="text-luxury-gold animate-pulse"> Cared for. Heard. Respected.</span>"
           </blockquote>
         </div>
