@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Calendar } from '@/components/ui/calendar';
+import { EnhancedCalendar } from '@/components/ui/enhanced-calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Checkbox } from '@/components/ui/checkbox';
 import { format } from 'date-fns';
@@ -460,13 +460,14 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({ onSuccess, onCancel }) => {
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
-                  <Calendar
+                  <EnhancedCalendar
                     mode="single"
                     selected={startDate}
                     onSelect={setStartDate}
                     initialFocus
                     className="pointer-events-auto"
                     disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                    enableYearDropdown={true}
                   />
                 </PopoverContent>
               </Popover>
@@ -488,13 +489,14 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({ onSuccess, onCancel }) => {
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
-                  <Calendar
+                  <EnhancedCalendar
                     mode="single"
                     selected={endDate}
                     onSelect={setEndDate}
                     initialFocus
                     className="pointer-events-auto"
                     disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0)) || (startDate && date < startDate)}
+                    enableYearDropdown={true}
                   />
                 </PopoverContent>
               </Popover>

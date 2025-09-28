@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/enhanced-button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Calendar } from "@/components/ui/calendar"
+import { EnhancedCalendar } from "@/components/ui/enhanced-calendar"
 import { 
   Popover, 
   PopoverContent, 
@@ -74,7 +74,7 @@ const Dashboard = () => {
     switch (status) {
       case "completed": return <CheckCircle className="w-4 h-4" />
       case "in-progress": return <Clock className="w-4 h-4" />
-      case "scheduled": return <Calendar className="w-4 h-4" />
+      case "scheduled": return <CalendarIcon className="w-4 h-4" />
       case "missed": return <AlertCircle className="w-4 h-4" />
       default: return <Package className="w-4 h-4" />
     }
@@ -109,11 +109,12 @@ const Dashboard = () => {
           <div className="space-y-6">
             <Card className="p-6">
               <h3 className="text-lg font-semibold text-luxury-navy mb-4">Pickup Calendar</h3>
-              <Calendar
+              <EnhancedCalendar
                 mode="single"
                 selected={selectedDate}
                 onSelect={setSelectedDate}
                 className="rounded-md border pointer-events-auto"
+                enableYearDropdown={true}
               />
             </Card>
 
@@ -148,12 +149,13 @@ const Dashboard = () => {
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
+                  <EnhancedCalendar
                     mode="single"
                     selected={selectedDate}
                     onSelect={setSelectedDate}
                     initialFocus
                     className="pointer-events-auto"
+                    enableYearDropdown={true}
                   />
                 </PopoverContent>
               </Popover>

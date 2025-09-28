@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/enhanced-button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar } from '@/components/ui/calendar';
+import { EnhancedCalendar } from '@/components/ui/enhanced-calendar';
 import { useToast } from '@/hooks/use-toast';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { 
@@ -483,11 +483,12 @@ const ImprovedDashboard = () => {
                     <CardTitle className="text-luxury-navy">Calendar</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <Calendar
+                    <EnhancedCalendar
                       mode="single"
                       selected={selectedDate}
                       onSelect={setSelectedDate}
                       className="rounded-md border"
+                      enableYearDropdown={true}
                     />
                   </CardContent>
                 </Card>
@@ -506,11 +507,12 @@ const ImprovedDashboard = () => {
                         </Button>
                       </DialogTrigger>
                       <DialogContent>
-                        <Calendar
+                        <EnhancedCalendar
                           mode="single"
                           selected={selectedDate}
                           onSelect={setSelectedDate}
                           className="rounded-md border"
+                          enableYearDropdown={true}
                         />
                       </DialogContent>
                     </Dialog>

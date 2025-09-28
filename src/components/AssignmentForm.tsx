@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { Calendar } from '@/components/ui/calendar';
+import { EnhancedCalendar } from '@/components/ui/enhanced-calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
@@ -245,11 +245,12 @@ const AssignmentForm: React.FC<AssignmentFormProps> = ({ onSuccess, onCancel }) 
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
-                  <Calendar
+                  <EnhancedCalendar
                     mode="single"
                     selected={startDate}
                     onSelect={setStartDate}
                     initialFocus
+                    enableYearDropdown={true}
                   />
                 </PopoverContent>
               </Popover>
@@ -272,12 +273,13 @@ const AssignmentForm: React.FC<AssignmentFormProps> = ({ onSuccess, onCancel }) 
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
-                <Calendar
+                <EnhancedCalendar
                   mode="single"
                   selected={endDate}
                   onSelect={setEndDate}
                   initialFocus
                   disabled={(date) => startDate ? date < startDate : false}
+                  enableYearDropdown={true}
                 />
               </PopoverContent>
             </Popover>
