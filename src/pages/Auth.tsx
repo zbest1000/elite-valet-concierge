@@ -68,11 +68,12 @@ const Auth = () => {
     }
   };
 
-  // Dev bypass function
+  // Dev bypass function with password
+  const [devPassword, setDevPassword] = useState('');
   const handleDevBypass = async () => {
     setLoading(true);
     try {
-      await devBypass();
+      await devBypass(devPassword);
       toast({
         title: "Dev Admin Access",
         description: "Entered development admin mode",
@@ -81,11 +82,12 @@ const Auth = () => {
     } catch (error: any) {
       toast({
         title: "Dev Bypass Failed",
-        description: error.message || "Could not enter dev mode",
+        description: error.message || "Invalid password",
         variant: "destructive",
       });
     } finally {
       setLoading(false);
+      setDevPassword('');
     }
   };
 
@@ -191,19 +193,26 @@ const Auth = () => {
         <Card className="shadow-elegant">
           <CardHeader>
             <CardTitle className="text-center text-luxury-navy">Welcome</CardTitle>
-            {/* Dev Bypass Button */}
-            <div className="text-center">
+            {/* Dev Bypass with Password */}
+            <div className="text-center space-y-2">
+              <Input
+                type="password"
+                placeholder="Dev password"
+                value={devPassword}
+                onChange={(e) => setDevPassword(e.target.value)}
+                className="text-center"
+              />
               <Button 
                 variant="outline" 
                 size="sm" 
                 onClick={handleDevBypass}
-                disabled={loading}
+                disabled={loading || !devPassword}
                 className="bg-yellow-50 border-yellow-200 text-yellow-800 hover:bg-yellow-100"
               >
                 <Zap className="w-4 h-4 mr-2" />
                 {loading ? 'Setting up...' : 'Dev Admin Access'}
               </Button>
-              <p className="text-xs text-muted-foreground mt-1">Quick dev access (creates admin@example.com)</p>
+              <p className="text-xs text-muted-foreground">Development admin access</p>
             </div>
           </CardHeader>
           <CardContent>
@@ -333,7 +342,7 @@ const Auth = () => {
                       <SelectContent>
                         <SelectItem value="resident">Resident</SelectItem>
                         <SelectItem value="elite_valet">Elite Valet Personnel</SelectItem>
-                        <SelectItem value="admin">Administrator</SelectItem>
+                        
                       </SelectContent>
                     </Select>
                   </div>

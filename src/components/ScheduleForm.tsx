@@ -42,6 +42,24 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({ onSuccess, onCancel }) => {
     recurrence_type: 'none',
     recurrence_days: [] as number[],
   });
+  
+  // Input validation
+  const validateInputs = () => {
+    const errors: string[] = [];
+    
+    if (formData.notes.length > 1000) {
+      errors.push('Notes must be less than 1000 characters');
+    }
+    
+    if (formData.scheduled_time) {
+      const [hours] = formData.scheduled_time.split(':').map(Number);
+      if (hours < 6 || hours > 22) {
+        errors.push('Pickup time must be between 6:00 AM and 10:00 PM');
+      }
+    }
+    
+    return errors;
+  };
 
   useEffect(() => {
     fetchApartments();
@@ -75,6 +93,18 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({ onSuccess, onCancel }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Enhanced validation
+    const validationErrors = validateInputs();
+    if (validationErrors.length > 0) {
+      toast({
+        title: "Validation Error",
+        description: validationErrors[0],
+        variant: "destructive",
+      });
+      return;
+    }
+    
     if (!selectedDate || !formData.apartment_id || !formData.scheduled_time) {
       toast({
         title: "Validation Error",

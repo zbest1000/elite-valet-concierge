@@ -11,7 +11,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   userProfile: any;
   refreshProfile: () => Promise<void>;
-  devBypass: () => Promise<void>;
+  devBypass: (password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -152,7 +152,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await supabase.auth.signOut();
   };
 
-  const devBypass = async () => {
+  const devBypass = async (password: string) => {
+    if (password !== 'Braka') {
+      throw new Error('Invalid password');
+    }
+    
     localStorage.setItem('dev-admin-session', 'true');
     
     const mockUser = {
