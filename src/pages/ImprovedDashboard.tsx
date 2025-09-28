@@ -24,6 +24,10 @@ import {
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import ScheduleForm from '@/components/ScheduleForm';
+import AssignmentForm from '@/components/AssignmentForm';
+import PropertyManager from '@/components/PropertyManager';
+import Analytics from '@/components/Analytics';
 
 interface PickupSchedule {
   id: string;
@@ -60,6 +64,9 @@ const ImprovedDashboard = () => {
   const [schedules, setSchedules] = useState<PickupSchedule[]>([]);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showScheduleForm, setShowScheduleForm] = useState(false);
+  const [showAssignmentForm, setShowAssignmentForm] = useState(false);
+  const [showPropertyManager, setShowPropertyManager] = useState(false);
   const [stats, setStats] = useState({
     scheduled: 0,
     completed: 0,
@@ -70,6 +77,29 @@ const ImprovedDashboard = () => {
   useEffect(() => {
     if (userProfile) {
       fetchData();
+      
+      // Set up real-time updates
+      const channel = supabase
+        .channel('dashboard-updates')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'pickup_schedules'
+        }, () => {
+          fetchData(); // Refresh data when schedules change
+        })
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'assignments'
+        }, () => {
+          fetchData(); // Refresh data when assignments change
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
   }, [userProfile]);
 
@@ -406,10 +436,23 @@ const ImprovedDashboard = () => {
                     </Dialog>
                   </div>
                   {userProfile?.role === 'admin' && (
-                    <Button variant="gold" size="sm" className="w-full sm:w-auto">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add Schedule
-                    </Button>
+                    <Dialog open={showScheduleForm} onOpenChange={setShowScheduleForm}>
+                      <DialogTrigger asChild>
+                        <Button variant="gold" size="sm" className="w-full sm:w-auto">
+                          <Plus className="w-4 h-4 mr-2" />
+                          Add Schedule
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-md">
+                        <ScheduleForm 
+                          onSuccess={() => {
+                            setShowScheduleForm(false);
+                            fetchData();
+                          }}
+                          onCancel={() => setShowScheduleForm(false)}
+                        />
+                      </DialogContent>
+                    </Dialog>
                   )}
                 </div>
 
@@ -515,10 +558,23 @@ const ImprovedDashboard = () => {
                   {userProfile?.role === 'admin' ? 'All Assignments' : 'My Assignments'}
                 </h2>
                 {userProfile?.role === 'admin' && (
-                  <Button variant="gold">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Create Assignment
-                  </Button>
+                  <Dialog open={showAssignmentForm} onOpenChange={setShowAssignmentForm}>
+                    <DialogTrigger asChild>
+                      <Button variant="gold">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Create Assignment
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl">
+                      <AssignmentForm 
+                        onSuccess={() => {
+                          setShowAssignmentForm(false);
+                          fetchData();
+                        }}
+                        onCancel={() => setShowAssignmentForm(false)}
+                      />
+                    </DialogContent>
+                  </Dialog>
                 )}
               </div>
 
@@ -593,10 +649,17 @@ const ImprovedDashboard = () => {
                     </CardHeader>
                     <CardContent>
                       <p className="text-muted-foreground mb-4">Manage complexes and apartments</p>
-                      <Button variant="outline" className="w-full">
-                        <Building className="w-4 h-4 mr-2" />
-                        Manage Properties
-                      </Button>
+                      <Dialog open={showPropertyManager} onOpenChange={setShowPropertyManager}>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" className="w-full">
+                            <Building className="w-4 h-4 mr-2" />
+                            Manage Properties
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                          <PropertyManager />
+                        </DialogContent>
+                      </Dialog>
                     </CardContent>
                   </Card>
                   
@@ -616,17 +679,7 @@ const ImprovedDashboard = () => {
               </TabsContent>
               
               <TabsContent value="analytics" className="space-y-6">
-                <h2 className="text-2xl font-bold text-luxury-navy">Analytics & Reports</h2>
-                <div className="grid gap-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Performance Overview</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground">Detailed analytics coming soon...</p>
-                    </CardContent>
-                  </Card>
-                </div>
+                <Analytics />
               </TabsContent>
             </>
           )}
