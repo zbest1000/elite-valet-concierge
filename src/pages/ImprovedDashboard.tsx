@@ -31,23 +31,36 @@ import Analytics from '@/components/Analytics';
 
 interface PickupSchedule {
   id: string;
-  apartment_id: string;
-  scheduled_date: string;
-  scheduled_time: string;
+  start_date: string;
+  end_date: string;
+  schedule_time_start: string;
+  schedule_time_end: string;
   status: string;
   notes?: string;
-  valet_id?: string;
-  recurrence_type?: string;
+  recurrence_type: string;
   recurrence_days?: number[];
-  recurrence_end_date?: string;
-  is_recurring_parent?: boolean;
+  target_type: string;
+  apartment_id?: string;
+  complex_id?: string;
+  building?: string;
+  floor_number?: number;
   apartment?: {
+    id?: string;
     unit_number: string;
     building: string;
     complex?: {
       name: string;
     };
   };
+  complex?: {
+    id?: string;
+    name: string;
+  };
+  valet_id?: string;
+  created_at: string;
+  // Legacy fields for backward compatibility
+  scheduled_date?: string;
+  scheduled_time?: string;
 }
 
 interface Assignment {
@@ -137,12 +150,13 @@ const ImprovedDashboard = () => {
       .select(`
         *,
         apartment:apartments(
+          id,
           unit_number,
           building,
           complex:complexes(name)
         )
       `)
-      .order('scheduled_date', { ascending: true })
+      .order('start_date', { ascending: true })
       .limit(20);
 
     const { data: assignmentsData, error: assignmentsError } = await supabase
@@ -492,23 +506,37 @@ const ImprovedDashboard = () => {
                                   <span className="capitalize">{schedule.status.replace("-", " ")}</span>
                                 </Badge>
                                 <span className="text-sm text-muted-foreground">
-                                  {format(new Date(schedule.scheduled_date), 'MMM dd, yyyy')}
-                                </span>
-                              </div>
-                              
-                              <h3 className="text-base sm:text-lg font-semibold text-luxury-navy mb-2">
-                                {schedule.apartment?.building} - Unit {schedule.apartment?.unit_number}
-                              </h3>
-                              
-                              <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 text-sm text-muted-foreground mb-3">
-                                <div className="flex items-center space-x-1">
-                                  <Clock className="w-4 h-4" />
-                                  <span>{schedule.scheduled_time}</span>
-                                </div>
-                                <div className="flex items-center space-x-1">
-                                  <Building className="w-4 h-4" />
-                                  <span>{schedule.apartment?.complex?.name}</span>
-                                </div>
+                                   {format(new Date(schedule.start_date || schedule.scheduled_date), 'MMM dd, yyyy')}
+                                   {schedule.end_date && schedule.end_date !== schedule.start_date && (
+                                     <span> - {format(new Date(schedule.end_date), 'MMM dd, yyyy')}</span>
+                                   )}
+                                 </span>
+                               </div>
+                               
+                               <h3 className="text-base sm:text-lg font-semibold text-luxury-navy mb-2">
+                                 {schedule.target_type === 'apartment' && schedule.apartment?.building && `${schedule.apartment.building} - Unit ${schedule.apartment.unit_number}`}
+                                 {schedule.target_type === 'building' && `Building ${schedule.building}`}
+                                 {schedule.target_type === 'floor' && `Building ${schedule.building} - Floor ${schedule.floor_number}`}
+                                 {schedule.target_type === 'complex' && schedule.complex?.name}
+                               </h3>
+                               
+                               <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 text-sm text-muted-foreground mb-3">
+                                 <div className="flex items-center space-x-1">
+                                   <Clock className="w-4 h-4" />
+                                   <span>
+                                     {schedule.schedule_time_start || schedule.scheduled_time}
+                                     {schedule.schedule_time_end && schedule.schedule_time_end !== schedule.schedule_time_start && 
+                                       ` - ${schedule.schedule_time_end}`
+                                     }
+                                   </span>
+                                 </div>
+                                 <div className="flex items-center space-x-1">
+                                   <Building className="w-4 h-4" />
+                                   <span>
+                                     {schedule.target_type === 'apartment' && schedule.apartment?.complex?.name}
+                                     {schedule.target_type !== 'apartment' && schedule.complex?.name}
+                                   </span>
+                                 </div>
                               </div>
                               
                               {schedule.recurrence_type && schedule.recurrence_type !== 'none' && (
@@ -521,9 +549,9 @@ const ImprovedDashboard = () => {
                                         ({schedule.recurrence_days.map(d => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d]).join(', ')})
                                       </span>
                                     )}
-                                    {schedule.recurrence_end_date && (
-                                      <span className="ml-1">until {format(new Date(schedule.recurrence_end_date), 'MMM dd')}</span>
-                                    )}
+                                     {schedule.end_date && schedule.recurrence_type !== 'none' && (
+                                       <span className="ml-1">until {format(new Date(schedule.end_date), 'MMM dd')}</span>
+                                     )}
                                   </span>
                                 </div>
                               )}
