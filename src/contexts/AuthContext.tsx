@@ -11,6 +11,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   userProfile: any;
   refreshProfile: () => Promise<void>;
+  devBypass: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -55,6 +56,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
+    // Check for dev mode first
+    const devSession = localStorage.getItem('dev-admin-session');
+    if (devSession) {
+      const mockUser = {
+        id: 'dev-admin-id',
+        email: 'admin@dev.local',
+        user_metadata: { first_name: 'Dev', last_name: 'Admin', role: 'admin' },
+        app_metadata: {},
+        aud: 'authenticated',
+        created_at: new Date().toISOString(),
+        role: 'authenticated'
+      } as User;
+      
+      const mockSession = {
+        access_token: 'dev-token',
+        token_type: 'bearer',
+        expires_in: 3600,
+        expires_at: Date.now() + 3600000,
+        refresh_token: 'dev-refresh',
+        user: mockUser
+      } as Session;
+      
+      setUser(mockUser);
+      setSession(mockSession);
+      setUserProfile({
+        id: 'dev-profile-id',
+        user_id: 'dev-admin-id',
+        first_name: 'Dev',
+        last_name: 'Admin',
+        role: 'admin'
+      });
+      setLoading(false);
+      return;
+    }
+
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
@@ -112,7 +148,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
+    localStorage.removeItem('dev-admin-session');
     await supabase.auth.signOut();
+  };
+
+  const devBypass = async () => {
+    localStorage.setItem('dev-admin-session', 'true');
+    
+    const mockUser = {
+      id: 'dev-admin-id',
+      email: 'admin@dev.local',
+      user_metadata: { first_name: 'Dev', last_name: 'Admin', role: 'admin' },
+      app_metadata: {},
+      aud: 'authenticated',
+      created_at: new Date().toISOString(),
+      role: 'authenticated'
+    } as User;
+    
+    const mockSession = {
+      access_token: 'dev-token',
+      token_type: 'bearer',
+      expires_in: 3600,
+      expires_at: Date.now() + 3600000,
+      refresh_token: 'dev-refresh',
+      user: mockUser
+    } as Session;
+    
+    setUser(mockUser);
+    setSession(mockSession);
+    setUserProfile({
+      id: 'dev-profile-id',
+      user_id: 'dev-admin-id',
+      first_name: 'Dev',
+      last_name: 'Admin',
+      role: 'admin'
+    });
   };
 
   const value = {
@@ -124,6 +194,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signOut,
     userProfile,
     refreshProfile,
+    devBypass,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

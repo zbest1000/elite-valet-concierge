@@ -21,7 +21,7 @@ const authSchema = z.object({
 });
 
 const Auth = () => {
-  const { signIn, signUp, user } = useAuth();
+  const { signIn, signUp, user, devBypass } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -68,42 +68,16 @@ const Auth = () => {
     }
   };
 
-  // Dev bypass function - creates a mock admin session
+  // Dev bypass function
   const handleDevBypass = async () => {
     setLoading(true);
     try {
-      // Create a mock user session directly in localStorage to bypass Supabase auth
-      const mockSession = {
-        access_token: 'dev-admin-token',
-        token_type: 'bearer',
-        expires_in: 3600,
-        expires_at: Date.now() + 3600000,
-        refresh_token: 'dev-refresh-token',
-        user: {
-          id: 'dev-admin-id',
-          email: 'admin@dev.local',
-          user_metadata: {
-            first_name: 'Dev',
-            last_name: 'Admin',
-            role: 'admin'
-          },
-          app_metadata: {},
-          aud: 'authenticated',
-          created_at: new Date().toISOString(),
-          role: 'authenticated'
-        }
-      };
-      
-      // Store the mock session
-      localStorage.setItem('supabase.auth.token', JSON.stringify(mockSession));
-      
+      await devBypass();
       toast({
         title: "Dev Admin Access",
         description: "Entered development admin mode",
       });
-      
-      // Force page reload to trigger auth state change
-      window.location.href = '/dashboard';
+      navigate('/dashboard');
     } catch (error: any) {
       toast({
         title: "Dev Bypass Failed",
