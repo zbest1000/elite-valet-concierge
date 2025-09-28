@@ -130,3 +130,20 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* Mobile-first responsive utilities */
+@layer utilities {
+  .container {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+  
+  /* Ensure touch targets are at least 44px for mobile */
+  .btn-touch {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  /* Mobile-friendly scrollable areas */
+  .scroll-mobile {
+    @apply overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 sm:overflow-x-visible;
+  }
+}

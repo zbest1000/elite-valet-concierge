@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 
 interface PickupSchedule {
   id: string;
@@ -268,17 +269,17 @@ const ImprovedDashboard = () => {
       {/* Header */}
       <header className="bg-card border-b border-border">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center space-x-4">
               <Link to="/" className="flex items-center space-x-2 text-luxury-navy hover:text-luxury-gold transition-colors">
                 <ArrowLeft className="w-5 h-5" />
-                <span>Back to Home</span>
+                <span className="hidden sm:inline">Back to Home</span>
               </Link>
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-gradient-gold rounded-full flex items-center justify-center">
                   <span className="text-luxury-navy font-bold text-sm">EV</span>
                 </div>
-                <span className="text-xl font-bold text-luxury-navy">
+                <span className="text-lg sm:text-xl font-bold text-luxury-navy">
                   {userProfile?.role === 'admin' ? 'Admin Dashboard' : 
                    userProfile?.role === 'elite_valet' ? 'Valet Dashboard' : 
                    'Resident Dashboard'}
@@ -286,78 +287,78 @@ const ImprovedDashboard = () => {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="text-sm text-muted-foreground">
+              <span className="text-sm text-muted-foreground hidden sm:inline">
                 Welcome, {userProfile?.first_name}
               </span>
               <Button variant="outline" size="sm">
-                <Settings className="w-4 h-4 mr-2" />
-                Settings
+                <Settings className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Settings</span>
               </Button>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-6 sm:py-8">
         <Tabs defaultValue="schedules" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="schedules">Schedules</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
+            <TabsTrigger value="schedules" className="text-xs sm:text-sm">Schedules</TabsTrigger>
             {(userProfile?.role === 'admin' || userProfile?.role === 'elite_valet') && (
-              <TabsTrigger value="assignments">Assignments</TabsTrigger>
+              <TabsTrigger value="assignments" className="text-xs sm:text-sm">Assignments</TabsTrigger>
             )}
             {userProfile?.role === 'admin' && (
               <>
-                <TabsTrigger value="management">Management</TabsTrigger>
-                <TabsTrigger value="analytics">Analytics</TabsTrigger>
+                <TabsTrigger value="management" className="text-xs sm:text-sm">Management</TabsTrigger>
+                <TabsTrigger value="analytics" className="text-xs sm:text-sm">Analytics</TabsTrigger>
               </>
             )}
           </TabsList>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Scheduled</p>
-                    <p className="text-2xl font-bold text-luxury-navy">{stats.scheduled}</p>
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Scheduled</p>
+                    <p className="text-xl sm:text-2xl font-bold text-luxury-navy">{stats.scheduled}</p>
                   </div>
-                  <CalendarIcon className="w-8 h-8 text-blue-500" />
+                  <CalendarIcon className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500" />
                 </div>
               </CardContent>
             </Card>
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">In Progress</p>
-                    <p className="text-2xl font-bold text-luxury-navy">{stats.inProgress}</p>
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">In Progress</p>
+                    <p className="text-xl sm:text-2xl font-bold text-luxury-navy">{stats.inProgress}</p>
                   </div>
-                  <Clock className="w-8 h-8 text-orange-500" />
+                  <Clock className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500" />
                 </div>
               </CardContent>
             </Card>
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Completed</p>
-                    <p className="text-2xl font-bold text-luxury-navy">{stats.completed}</p>
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Completed</p>
+                    <p className="text-xl sm:text-2xl font-bold text-luxury-navy">{stats.completed}</p>
                   </div>
-                  <CheckCircle className="w-8 h-8 text-green-500" />
+                  <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8 text-green-500" />
                 </div>
               </CardContent>
             </Card>
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">
                       {userProfile?.role === 'admin' ? 'Total Assignments' : 'My Assignments'}
                     </p>
-                    <p className="text-2xl font-bold text-luxury-navy">{stats.totalAssignments}</p>
+                    <p className="text-xl sm:text-2xl font-bold text-luxury-navy">{stats.totalAssignments}</p>
                   </div>
-                  <Users className="w-8 h-8 text-purple-500" />
+                  <Users className="w-6 h-6 sm:w-8 sm:h-8 text-purple-500" />
                 </div>
               </CardContent>
             </Card>
@@ -365,8 +366,8 @@ const ImprovedDashboard = () => {
 
           <TabsContent value="schedules" className="space-y-6">
             <div className="grid lg:grid-cols-3 gap-6">
-              {/* Calendar Sidebar */}
-              <div className="space-y-6">
+              {/* Calendar Sidebar - Hidden on mobile, shown in modal or separate section */}
+              <div className="hidden lg:block space-y-6">
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-luxury-navy">Calendar</CardTitle>
@@ -384,10 +385,28 @@ const ImprovedDashboard = () => {
 
               {/* Schedules List */}
               <div className="lg:col-span-2 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-bold text-luxury-navy">Pickup Schedules</h2>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="flex items-center space-x-2">
+                    <h2 className="text-xl sm:text-2xl font-bold text-luxury-navy">Pickup Schedules</h2>
+                    {/* Mobile Calendar Toggle */}
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm" className="lg:hidden">
+                          <CalendarIcon className="w-4 h-4" />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <Calendar
+                          mode="single"
+                          selected={selectedDate}
+                          onSelect={setSelectedDate}
+                          className="rounded-md border"
+                        />
+                      </DialogContent>
+                    </Dialog>
+                  </div>
                   {userProfile?.role === 'admin' && (
-                    <Button variant="gold">
+                    <Button variant="gold" size="sm" className="w-full sm:w-auto">
                       <Plus className="w-4 h-4 mr-2" />
                       Add Schedule
                     </Button>
@@ -395,86 +414,94 @@ const ImprovedDashboard = () => {
                 </div>
 
                 <div className="space-y-4">
-                  {schedules.map((schedule) => (
-                    <Card key={schedule.id} className="hover:shadow-elegant transition-shadow duration-300">
-                      <CardContent className="p-6">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-3 mb-3">
-                              <Badge className={`flex items-center space-x-1 ${getStatusColor(schedule.status)}`}>
-                                {getStatusIcon(schedule.status)}
-                                <span className="capitalize">{schedule.status.replace("-", " ")}</span>
-                              </Badge>
-                              <span className="text-sm text-muted-foreground">
-                                {format(new Date(schedule.scheduled_date), 'MMM dd, yyyy')}
-                              </span>
-                            </div>
-                            
-                            <h3 className="text-lg font-semibold text-luxury-navy mb-2">
-                              {schedule.apartment?.building} - Unit {schedule.apartment?.unit_number}
-                            </h3>
-                            
-                            <div className="flex items-center space-x-4 text-sm text-muted-foreground mb-3">
-                              <div className="flex items-center space-x-1">
-                                <Clock className="w-4 h-4" />
-                                <span>{schedule.scheduled_time}</span>
-                              </div>
-                              <div className="flex items-center space-x-1">
-                                <Building className="w-4 h-4" />
-                                <span>{schedule.apartment?.complex?.name}</span>
-                              </div>
-                            </div>
-                            
-                            {schedule.notes && (
-                              <p className="text-sm text-muted-foreground bg-muted p-3 rounded-lg">
-                                {schedule.notes}
-                              </p>
-                            )}
-                          </div>
-                          
-                          <div className="flex flex-col space-y-2">
-                            {schedule.status === "scheduled" && userProfile?.role !== 'resident' && (
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => updateScheduleStatus(schedule.id, "in-progress", "Service has begun")}
-                              >
-                                Start Service
-                              </Button>
-                            )}
-                            {schedule.status === "in-progress" && userProfile?.role !== 'resident' && (
-                              <Button 
-                                variant="premium" 
-                                size="sm"
-                                onClick={() => updateScheduleStatus(schedule.id, "completed", "Service completed successfully")}
-                              >
-                                Mark Complete
-                              </Button>
-                            )}
-                            {userProfile?.role === 'admin' && (
-                              <Button variant="ghost" size="sm">
-                                <Edit className="w-4 h-4 mr-2" />
-                                Edit
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                  
-                  {schedules.length === 0 && (
-                    <Card className="p-6 border-dashed border-2 border-luxury-gold/30 bg-luxury-gold/5">
+                  {schedules.length === 0 ? (
+                    <Card className="p-8 sm:p-12">
                       <div className="text-center">
-                        <Package className="w-12 h-12 text-luxury-gold mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold text-luxury-navy mb-2">No Schedules Found</h3>
-                        <p className="text-muted-foreground mb-4">
-                          {userProfile?.role === 'resident' 
-                            ? "You don't have any pickup schedules yet." 
-                            : "No pickup schedules assigned to you."}
+                        <Package className="w-12 h-12 sm:w-16 sm:h-16 text-luxury-gold mx-auto mb-4" />
+                        <h3 className="text-lg sm:text-xl font-semibold text-luxury-navy mb-2">No Schedules Found</h3>
+                        <p className="text-sm sm:text-base text-muted-foreground mb-4">
+                          {userProfile?.role === 'admin' 
+                            ? 'No pickup schedules have been created yet.' 
+                            : 'No pickup schedules assigned to you.'}
                         </p>
+                        {userProfile?.role === 'admin' && (
+                          <Button variant="gold">
+                            <Plus className="w-4 h-4 mr-2" />
+                            Create First Schedule
+                          </Button>
+                        )}
                       </div>
                     </Card>
+                  ) : (
+                    schedules.map((schedule) => (
+                      <Card key={schedule.id} className="hover:shadow-elegant transition-shadow duration-300">
+                        <CardContent className="p-4 sm:p-6">
+                          <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
+                            <div className="flex-1 w-full">
+                              <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-3">
+                                <Badge className={`flex items-center space-x-1 w-fit ${getStatusColor(schedule.status)}`}>
+                                  {getStatusIcon(schedule.status)}
+                                  <span className="capitalize">{schedule.status.replace("-", " ")}</span>
+                                </Badge>
+                                <span className="text-sm text-muted-foreground">
+                                  {format(new Date(schedule.scheduled_date), 'MMM dd, yyyy')}
+                                </span>
+                              </div>
+                              
+                              <h3 className="text-base sm:text-lg font-semibold text-luxury-navy mb-2">
+                                {schedule.apartment?.building} - Unit {schedule.apartment?.unit_number}
+                              </h3>
+                              
+                              <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 text-sm text-muted-foreground mb-3">
+                                <div className="flex items-center space-x-1">
+                                  <Clock className="w-4 h-4" />
+                                  <span>{schedule.scheduled_time}</span>
+                                </div>
+                                <div className="flex items-center space-x-1">
+                                  <Building className="w-4 h-4" />
+                                  <span>{schedule.apartment?.complex?.name}</span>
+                                </div>
+                              </div>
+                              
+                              {schedule.notes && (
+                                <p className="text-sm text-muted-foreground bg-muted p-3 rounded-lg">
+                                  {schedule.notes}
+                                </p>
+                              )}
+                            </div>
+                            
+                            <div className="flex flex-row sm:flex-col space-x-2 sm:space-x-0 sm:space-y-2 w-full sm:w-auto">
+                              {schedule.status === "scheduled" && userProfile?.role !== 'resident' && (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  className="flex-1 sm:flex-none"
+                                  onClick={() => updateScheduleStatus(schedule.id, "in-progress", "Service has begun")}
+                                >
+                                  Start Service
+                                </Button>
+                              )}
+                              {schedule.status === "in-progress" && userProfile?.role !== 'resident' && (
+                                <Button 
+                                  variant="premium" 
+                                  size="sm"
+                                  className="flex-1 sm:flex-none"
+                                  onClick={() => updateScheduleStatus(schedule.id, "completed", "Service completed successfully")}
+                                >
+                                  Mark Complete
+                                </Button>
+                              )}
+                              {userProfile?.role === 'admin' && (
+                                <Button variant="ghost" size="sm" className="flex-1 sm:flex-none">
+                                  <Edit className="w-4 h-4 sm:mr-2" />
+                                  <span className="hidden sm:inline">Edit</span>
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))
                   )}
                 </div>
               </div>
