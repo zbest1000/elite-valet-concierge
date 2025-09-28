@@ -27,9 +27,9 @@ const features = [
   },
   {
     icon: Building,
-    title: "Property Integration",
-    description: "Seamless coordination",
-    detail: "Designed to work flawlessly with any building management system and property requirements."
+    title: "Property Coordination",
+    description: "Working with your team",
+    detail: "We coordinate directly with property managers and building staff to ensure smooth service delivery."
   },
   {
     icon: Heart,
