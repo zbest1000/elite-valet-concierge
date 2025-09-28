@@ -176,7 +176,12 @@ export type Database = {
           created_at: string
           created_by: string
           id: string
+          is_recurring_parent: boolean | null
           notes: string | null
+          parent_schedule_id: string | null
+          recurrence_days: number[] | null
+          recurrence_end_date: string | null
+          recurrence_type: string | null
           scheduled_date: string
           scheduled_time: string
           status: string
@@ -188,7 +193,12 @@ export type Database = {
           created_at?: string
           created_by: string
           id?: string
+          is_recurring_parent?: boolean | null
           notes?: string | null
+          parent_schedule_id?: string | null
+          recurrence_days?: number[] | null
+          recurrence_end_date?: string | null
+          recurrence_type?: string | null
           scheduled_date: string
           scheduled_time: string
           status?: string
@@ -200,7 +210,12 @@ export type Database = {
           created_at?: string
           created_by?: string
           id?: string
+          is_recurring_parent?: boolean | null
           notes?: string | null
+          parent_schedule_id?: string | null
+          recurrence_days?: number[] | null
+          recurrence_end_date?: string | null
+          recurrence_type?: string | null
           scheduled_date?: string
           scheduled_time?: string
           status?: string
@@ -220,6 +235,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pickup_schedules_parent_schedule_id_fkey"
+            columns: ["parent_schedule_id"]
+            isOneToOne: false
+            referencedRelation: "pickup_schedules"
             referencedColumns: ["id"]
           },
           {

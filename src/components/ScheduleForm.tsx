@@ -34,10 +34,13 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({ onSuccess, onCancel }) => {
   const [loading, setLoading] = useState(false);
   const [apartments, setApartments] = useState<Apartment[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>();
+  const [endDate, setEndDate] = useState<Date>();
   const [formData, setFormData] = useState({
     apartment_id: '',
     scheduled_time: '',
     notes: '',
+    recurrence_type: 'none',
+    recurrence_days: [] as number[],
   });
 
   useEffect(() => {
@@ -81,20 +84,36 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({ onSuccess, onCancel }) => {
       return;
     }
 
+    if (formData.recurrence_type !== 'none' && (!endDate || endDate <= selectedDate)) {
+      toast({
+        title: "Validation Error", 
+        description: "Please select a valid end date for recurring schedules",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
-      const { error } = await supabase
-        .from('pickup_schedules')
-        .insert({
-          apartment_id: formData.apartment_id,
-          scheduled_date: format(selectedDate, 'yyyy-MM-dd'),
-          scheduled_time: formData.scheduled_time,
-          status: 'scheduled',
-          notes: formData.notes || null,
-          created_by: userProfile.id,
-        });
+      if (formData.recurrence_type === 'none') {
+        // Create single schedule
+        const { error } = await supabase
+          .from('pickup_schedules')
+          .insert({
+            apartment_id: formData.apartment_id,
+            scheduled_date: format(selectedDate, 'yyyy-MM-dd'),
+            scheduled_time: formData.scheduled_time,
+            status: 'scheduled',
+            notes: formData.notes || null,
+            created_by: userProfile.id,
+            recurrence_type: 'none',
+          });
 
-      if (error) throw error;
+        if (error) throw error;
+      } else {
+        // Create recurring schedules
+        await createRecurringSchedules();
+      }
 
       toast({
         title: "Success",
@@ -109,6 +128,89 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({ onSuccess, onCancel }) => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const createRecurringSchedules = async () => {
+    const schedules = [];
+    const currentDate = new Date(selectedDate!);
+    const endDateTime = new Date(endDate!);
+    
+    while (currentDate <= endDateTime) {
+      let shouldCreateSchedule = false;
+      
+      if (formData.recurrence_type === 'daily') {
+        shouldCreateSchedule = formData.recurrence_days.length === 0 || 
+          formData.recurrence_days.includes(currentDate.getDay());
+      } else if (formData.recurrence_type === 'weekly') {
+        shouldCreateSchedule = formData.recurrence_days.includes(currentDate.getDay());
+      } else if (formData.recurrence_type === 'bi-weekly') {
+        const weeksDiff = Math.floor((currentDate.getTime() - selectedDate!.getTime()) / (7 * 24 * 60 * 60 * 1000));
+        shouldCreateSchedule = weeksDiff % 2 === 0 && formData.recurrence_days.includes(currentDate.getDay());
+      }
+      
+      if (shouldCreateSchedule) {
+        schedules.push({
+          apartment_id: formData.apartment_id,
+          scheduled_date: format(currentDate, 'yyyy-MM-dd'),
+          scheduled_time: formData.scheduled_time,
+          status: 'scheduled',
+          notes: formData.notes || null,
+          created_by: userProfile.id,
+          recurrence_type: formData.recurrence_type,
+          recurrence_days: formData.recurrence_days.length > 0 ? formData.recurrence_days : null,
+          recurrence_end_date: format(endDate!, 'yyyy-MM-dd'),
+          is_recurring_parent: schedules.length === 0,
+        });
+      }
+      
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    
+    if (schedules.length === 0) {
+      throw new Error('No schedules would be created with the selected recurrence pattern');
+    }
+    
+    const { data: parentSchedule, error: parentError } = await supabase
+      .from('pickup_schedules')
+      .insert(schedules[0])
+      .select()
+      .single();
+      
+    if (parentError) throw parentError;
+    
+    if (schedules.length > 1) {
+      const childSchedules = schedules.slice(1).map(schedule => ({
+        ...schedule,
+        parent_schedule_id: parentSchedule.id,
+        is_recurring_parent: false,
+      }));
+      
+      const { error: childError } = await supabase
+        .from('pickup_schedules')
+        .insert(childSchedules);
+        
+      if (childError) throw childError;
+    }
+  };
+
+  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  
+  const toggleDay = (dayIndex: number) => {
+    setFormData(prev => ({
+      ...prev,
+      recurrence_days: prev.recurrence_days.includes(dayIndex)
+        ? prev.recurrence_days.filter(d => d !== dayIndex)
+        : [...prev.recurrence_days, dayIndex].sort()
+    }));
+  };
+
+  const getPresetDays = (preset: string) => {
+    switch (preset) {
+      case 'weekdays': return [1, 2, 3, 4, 5]; // Mon-Fri
+      case 'sun-thurs': return [0, 1, 2, 3, 4]; // Sun-Thu
+      case 'weekends': return [0, 6]; // Sat-Sun
+      default: return [];
     }
   };
 
@@ -172,6 +274,110 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({ onSuccess, onCancel }) => {
               required
             />
           </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="notes">Notes (Optional)</Label>
+            <Textarea
+              id="notes"
+              placeholder="Any special instructions or notes..."
+              value={formData.notes}
+              onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+              rows={3}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Recurrence</Label>
+            <Select value={formData.recurrence_type} onValueChange={(value) => setFormData(prev => ({ ...prev, recurrence_type: value, recurrence_days: [] }))}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select recurrence" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No Recurrence</SelectItem>
+                <SelectItem value="daily">Daily</SelectItem>
+                <SelectItem value="weekly">Weekly</SelectItem>
+                <SelectItem value="bi-weekly">Bi-Weekly</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {formData.recurrence_type !== 'none' && (
+            <>
+              <div className="space-y-2">
+                <Label>Days of Week</Label>
+                <div className="space-y-2">
+                  <div className="flex gap-2 text-sm">
+                    <Button
+                      type="button"
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setFormData(prev => ({ ...prev, recurrence_days: getPresetDays('weekdays') }))}
+                    >
+                      Weekdays
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm" 
+                      onClick={() => setFormData(prev => ({ ...prev, recurrence_days: getPresetDays('sun-thurs') }))}
+                    >
+                      Sun-Thu
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setFormData(prev => ({ ...prev, recurrence_days: getPresetDays('weekends') }))}
+                    >
+                      Weekends
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-4 gap-2">
+                    {dayNames.map((day, index) => (
+                      <Button
+                        key={day}
+                        type="button"
+                        variant={formData.recurrence_days.includes(index) ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => toggleDay(index)}
+                        className="text-xs"
+                      >
+                        {day.slice(0, 3)}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>End Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !endDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {endDate ? format(endDate, "PPP") : <span>Pick end date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={endDate}
+                      onSelect={setEndDate}
+                      disabled={(date) => selectedDate ? date <= selectedDate : date <= new Date()}
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="notes">Notes (Optional)</Label>

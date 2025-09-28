@@ -36,6 +36,11 @@ interface PickupSchedule {
   scheduled_time: string;
   status: string;
   notes?: string;
+  valet_id?: string;
+  recurrence_type?: string;
+  recurrence_days?: number[];
+  recurrence_end_date?: string;
+  is_recurring_parent?: boolean;
   apartment?: {
     unit_number: string;
     building: string;
@@ -505,6 +510,23 @@ const ImprovedDashboard = () => {
                                   <span>{schedule.apartment?.complex?.name}</span>
                                 </div>
                               </div>
+                              
+                              {schedule.recurrence_type && schedule.recurrence_type !== 'none' && (
+                                <div className="flex items-center space-x-1 text-sm text-muted-foreground mb-2">
+                                  <CalendarIcon className="w-4 h-4" />
+                                  <span className="capitalize">
+                                    {schedule.recurrence_type} 
+                                    {schedule.recurrence_days && schedule.recurrence_days.length > 0 && (
+                                      <span className="ml-1">
+                                        ({schedule.recurrence_days.map(d => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d]).join(', ')})
+                                      </span>
+                                    )}
+                                    {schedule.recurrence_end_date && (
+                                      <span className="ml-1">until {format(new Date(schedule.recurrence_end_date), 'MMM dd')}</span>
+                                    )}
+                                  </span>
+                                </div>
+                              )}
                               
                               {schedule.notes && (
                                 <p className="text-sm text-muted-foreground bg-muted p-3 rounded-lg">
