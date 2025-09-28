@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/enhanced-button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, Zap } from 'lucide-react';
 import { z } from 'zod';
 
 const authSchema = z.object({
@@ -64,6 +65,57 @@ const Auth = () => {
         setErrors(newErrors);
       }
       return false;
+    }
+  };
+
+  // Dev bypass function
+  const handleDevBypass = async () => {
+    setLoading(true);
+    try {
+      // Create a dev admin account or sign in
+      const devEmail = 'dev-admin@elitevalet.test';
+      const devPassword = 'devpass123';
+      
+      // Try to sign in first
+      let { error } = await signIn(devEmail, devPassword);
+      
+      if (error && error.message.includes('Invalid login credentials')) {
+        // If sign in fails, create the account
+        const { error: signUpError } = await signUp(devEmail, devPassword, {
+          first_name: 'Dev',
+          last_name: 'Admin',
+          role: 'admin',
+        });
+        
+        if (signUpError) {
+          throw signUpError;
+        }
+        
+        // Promote to admin via database function
+        await supabase.rpc('promote_user_to_admin', { user_email: devEmail });
+        
+        // Now sign in
+        const { error: signInError } = await signIn(devEmail, devPassword);
+        if (signInError) {
+          throw signInError;
+        }
+      } else if (error) {
+        throw error;
+      }
+      
+      toast({
+        title: "Dev Admin Access",
+        description: "Signed in as development admin",
+      });
+      navigate('/dashboard');
+    } catch (error: any) {
+      toast({
+        title: "Dev Bypass Failed",
+        description: error.message || "Could not create dev admin account",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -169,6 +221,20 @@ const Auth = () => {
         <Card className="shadow-elegant">
           <CardHeader>
             <CardTitle className="text-center text-luxury-navy">Welcome</CardTitle>
+            {/* Dev Bypass Button */}
+            <div className="text-center">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleDevBypass}
+                disabled={loading}
+                className="bg-yellow-50 border-yellow-200 text-yellow-800 hover:bg-yellow-100"
+              >
+                <Zap className="w-4 h-4 mr-2" />
+                Dev Admin Access
+              </Button>
+              <p className="text-xs text-muted-foreground mt-1">Quick dev access (creates admin@test account)</p>
+            </div>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="signin" className="w-full">
@@ -186,7 +252,7 @@ const Auth = () => {
                       type="email"
                       value={formData.email}
                       onChange={(e) => handleInputChange('email', e.target.value)}
-                      placeholder="your@email.com"
+                      placeholder="admin@test.com"
                       required
                     />
                     {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
@@ -260,7 +326,7 @@ const Auth = () => {
                       type="email"
                       value={formData.email}
                       onChange={(e) => handleInputChange('email', e.target.value)}
-                      placeholder="your@email.com"
+                      placeholder="admin@test.com"
                       required
                     />
                     {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
