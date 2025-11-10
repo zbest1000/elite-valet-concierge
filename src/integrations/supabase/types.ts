@@ -353,6 +353,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "pickup_schedules_apartment_id_fkey"
+            columns: ["apartment_id"]
+            isOneToOne: false
+            referencedRelation: "valet_apartments"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "pickup_schedules_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
@@ -552,7 +559,47 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      valet_apartments: {
+        Row: {
+          building: string | null
+          complex_id: string | null
+          created_at: string | null
+          floor_number: number | null
+          id: string | null
+          is_active: boolean | null
+          unit_number: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          building?: string | null
+          complex_id?: string | null
+          created_at?: string | null
+          floor_number?: number | null
+          id?: string | null
+          is_active?: boolean | null
+          unit_number?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          building?: string | null
+          complex_id?: string | null
+          created_at?: string | null
+          floor_number?: number | null
+          id?: string | null
+          is_active?: boolean | null
+          unit_number?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "apartments_complex_id_fkey"
+            columns: ["complex_id"]
+            isOneToOne: false
+            referencedRelation: "complexes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       bulk_create_apartments: {
