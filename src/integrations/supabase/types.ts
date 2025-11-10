@@ -589,6 +589,45 @@ export type Database = {
       }
     }
     Views: {
+      public_building_templates: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          floors_count: number | null
+          id: string | null
+          is_public: boolean | null
+          name: string | null
+          naming_pattern: string | null
+          units_per_floor: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: never
+          description?: string | null
+          floors_count?: number | null
+          id?: string | null
+          is_public?: boolean | null
+          name?: string | null
+          naming_pattern?: string | null
+          units_per_floor?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: never
+          description?: string | null
+          floors_count?: number | null
+          id?: string | null
+          is_public?: boolean | null
+          name?: string | null
+          naming_pattern?: string | null
+          units_per_floor?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       valet_apartments: {
         Row: {
           building: string | null
