@@ -526,6 +526,30 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -542,22 +566,20 @@ export type Database = {
         }
         Returns: number
       }
-      create_dev_test_data: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      create_dev_test_data: { Args: never; Returns: string }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["user_role"]
       }
-      is_admin: {
-        Args: { _user_id: string }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["user_role"]
+          _user_id: string
+        }
         Returns: boolean
       }
-      promote_user_to_admin: {
-        Args: { user_email: string }
-        Returns: string
-      }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
+      promote_user_to_admin: { Args: { user_email: string }; Returns: string }
     }
     Enums: {
       assignment_status: "pending" | "active" | "completed" | "cancelled"

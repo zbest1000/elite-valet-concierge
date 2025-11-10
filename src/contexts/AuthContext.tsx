@@ -32,18 +32,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchUserProfile = async (userId: string) => {
     try {
-      const { data, error } = await supabase
+      // Fetch profile data
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('user_id', userId)
         .single();
       
-      if (error) {
-        console.error('Error fetching user profile:', error);
+      if (profileError) {
+        console.error('Error fetching user profile:', profileError);
         return;
       }
-      
-      setUserProfile(data);
+
+      // Fetch user role from user_roles table
+      const { data: roleData, error: roleError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .single();
+
+      if (roleError && roleError.code !== 'PGRST116') {
+        // PGRST116 is "no rows returned" - user might not have a role yet
+        console.error('Error fetching user role:', roleError);
+      }
+
+      // Combine profile with role data
+      setUserProfile({
+        ...profile,
+        role: roleData?.role || 'resident'
+      });
     } catch (error) {
       console.error('Error fetching user profile:', error);
     }
