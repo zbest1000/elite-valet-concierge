@@ -37,7 +37,6 @@ interface PickupSchedule {
     building: string;
     floor_number: number;
     complex?: { name: string };
-    resident?: { first_name: string; last_name: string };
   };
 }
 
@@ -79,12 +78,11 @@ const ValetWorkflow: React.FC = () => {
         .from('pickup_schedules')
         .select(`
           *,
-          apartment:apartments(
+          apartment:valet_apartments(
             unit_number,
             building,
             floor_number,
-            complex:complexes(name),
-            resident:profiles(first_name, last_name)
+            complex:complexes(name)
           )
         `)
         .in('status', ['scheduled', 'in-progress'])
@@ -255,7 +253,7 @@ const ValetWorkflow: React.FC = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Schedule Info */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-luxury-gold" />
                   <span>{new Date(schedule.scheduled_date).toLocaleDateString()}</span>
@@ -264,14 +262,6 @@ const ValetWorkflow: React.FC = () => {
                   <Clock className="w-4 h-4 text-luxury-gold" />
                   <span>{formatTime(schedule.scheduled_time)}</span>
                 </div>
-                {schedule.apartment?.resident && (
-                  <div className="flex items-center gap-2">
-                    <User className="w-4 h-4 text-luxury-gold" />
-                    <span>
-                      {schedule.apartment.resident.first_name} {schedule.apartment.resident.last_name}
-                    </span>
-                  </div>
-                )}
               </div>
 
               {/* Notes */}
