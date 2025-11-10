@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_profile_access_logs: {
+        Row: {
+          access_type: string
+          accessed_at: string
+          accessed_profile_id: string
+          admin_user_id: string
+          id: string
+          ip_address: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          access_type: string
+          accessed_at?: string
+          accessed_profile_id: string
+          admin_user_id: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          access_type?: string
+          accessed_at?: string
+          accessed_profile_id?: string
+          admin_user_id?: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       apartments: {
         Row: {
           building: string
